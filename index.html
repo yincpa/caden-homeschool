@@ -128,7 +128,10 @@ textarea.note:focus { outline: none; border-color: var(--blue); }
 select { font-size: 13px; padding: 7px 8px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg); color: var(--text); font-family: inherit; }
 
 /* TIMER */
-.timer-modes { display: flex; justify-content: center; gap: 8px; margin-bottom: 1.5rem; }
+.timer-sub-btn { padding:10px 14px;font-size:13px;font-weight:500;border:none;background:none;cursor:pointer;color:var(--text-2);border-bottom:2px solid transparent;margin-bottom:-1px;font-family:inherit;white-space:nowrap; }
+.timer-sub-btn.active { color:var(--blue);border-bottom-color:var(--blue); }
+.timer-sub-btn:hover:not(.active) { color:var(--text); }
+
 .mode-btn { font-size: 13px; padding: 7px 18px; border: 1px solid var(--border); border-radius: 99px; background: none; cursor: pointer; color: var(--text-2); font-family: inherit; }
 .mode-btn.active { background: var(--blue); color: white; border-color: var(--blue); }
 .timer-face { text-align: center; padding: 2rem 0 1.5rem; }
@@ -202,7 +205,7 @@ select { font-size: 13px; padding: 7px 8px; border: 1px solid var(--border); bor
     <button class="nav-btn active" onclick="switchTab('courses')">📚 Courses</button>
     <button class="nav-btn" onclick="switchTab('schedule')">📅 Schedule</button>
     <button class="nav-btn" onclick="switchTab('todos')">✅ To-Do</button>
-    <button class="nav-btn" onclick="switchTab('timer')">⏱ Timer</button>
+    <button class="nav-btn" onclick="switchTab('timer')">⏱ Timers</button>
     <button class="nav-btn" onclick="switchTab('calendar')">🗓 Dates</button>
     <button class="nav-btn" onclick="switchTab('help')">🙋 Help</button>
   </nav>
@@ -259,26 +262,75 @@ select { font-size: 13px; padding: 7px 8px; border: 1px solid var(--border); bor
 
     <!-- TIMER TAB -->
     <div id="tab-timer" class="tab">
-      <div class="timer-modes">
-        <button class="mode-btn active" id="mode-pomodoro" onclick="setMode('pomodoro')">Pomodoro</button>
-        <button class="mode-btn" id="mode-countdown" onclick="setMode('countdown')">Countdown</button>
-        <button class="mode-btn" id="mode-stopwatch" onclick="setMode('stopwatch')">Stopwatch</button>
+      <!-- Sub-tab bar -->
+      <div style="display:flex;gap:2px;border-bottom:1px solid var(--border);margin-bottom:1.5rem;">
+        <button class="timer-sub-btn active" id="tsub-clock" onclick="switchTimerSub('clock')">🕐 Clock</button>
+        <button class="timer-sub-btn" id="tsub-pomodoro" onclick="switchTimerSub('pomodoro')">🍅 Pomodoro</button>
+        <button class="timer-sub-btn" id="tsub-countdown" onclick="switchTimerSub('countdown')">⏳ Countdown</button>
+        <button class="timer-sub-btn" id="tsub-stopwatch" onclick="switchTimerSub('stopwatch')">⏱ Stopwatch</button>
       </div>
-      <div class="timer-face">
-        <div class="timer-digits" id="timer-digits">25:00</div>
-        <div class="timer-sublabel" id="timer-sublabel">Focus session</div>
+
+      <!-- CLOCK SUB-TAB -->
+      <div id="tsub-clock-panel">
+        <div style="text-align:center;padding:1rem 0 0.5rem;">
+          <div id="clock-daydate" style="font-size:22px;font-weight:600;color:var(--text);margin-bottom:4px;"></div>
+          <div id="clock-fulldate" style="font-size:14px;color:var(--text-2);margin-bottom:2rem;"></div>
+        </div>
+        <div style="display:flex;justify-content:center;margin-bottom:2rem;">
+          <canvas id="analog-clock" width="280" height="280"></canvas>
+        </div>
+        <div style="text-align:center;">
+          <div id="clock-digital" style="font-size:32px;font-weight:600;font-family:'DM Mono',monospace;color:var(--text);letter-spacing:0.05em;"></div>
+          <div id="clock-ampm" style="font-size:14px;color:var(--text-3);margin-top:2px;"></div>
+        </div>
       </div>
-      <div class="pom-dots" id="pom-dots"></div>
-      <div id="countdown-set" style="display:none;text-align:center;margin-bottom:1rem;">
-        <label style="font-size:13px;color:var(--text-2);">Minutes: </label>
-        <input type="number" id="countdown-mins" value="30" min="1" max="180" style="width:65px;font-size:14px;padding:4px 8px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);font-family:'DM Mono',monospace;text-align:center;" onchange="resetTimer()">
+
+      <!-- POMODORO SUB-TAB -->
+      <div id="tsub-pomodoro-panel" style="display:none;">
+        <div class="timer-face">
+          <div class="timer-digits" id="timer-digits">25:00</div>
+          <div class="timer-sublabel" id="timer-sublabel">Focus session</div>
+        </div>
+        <div class="pom-dots" id="pom-dots"></div>
+        <div class="timer-ctrls">
+          <button class="btn-sm" onclick="resetTimer()">↺ Reset</button>
+          <button class="btn-sm primary" id="start-btn" onclick="toggleTimer()">▶ Start</button>
+        </div>
+        <div class="section-label">Session log</div>
+        <div class="card" id="timer-log"><div style="font-size:13px;color:var(--text-3);">No sessions yet.</div></div>
       </div>
-      <div class="timer-ctrls">
-        <button class="btn-sm" onclick="resetTimer()">↺ Reset</button>
-        <button class="btn-sm primary" id="start-btn" onclick="toggleTimer()">▶ Start</button>
+
+      <!-- COUNTDOWN SUB-TAB -->
+      <div id="tsub-countdown-panel" style="display:none;">
+        <div class="timer-face">
+          <div class="timer-digits" id="timer-digits-cd">30:00</div>
+          <div class="timer-sublabel" id="timer-sublabel-cd">Countdown</div>
+        </div>
+        <div style="text-align:center;margin-bottom:1rem;">
+          <label style="font-size:13px;color:var(--text-2);">Minutes: </label>
+          <input type="number" id="countdown-mins" value="30" min="1" max="180" style="width:65px;font-size:14px;padding:4px 8px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);font-family:'DM Mono',monospace;text-align:center;" onchange="resetCountdown()">
+        </div>
+        <div class="timer-ctrls">
+          <button class="btn-sm" onclick="resetCountdown()">↺ Reset</button>
+          <button class="btn-sm primary" id="start-btn-cd" onclick="toggleCountdown()">▶ Start</button>
+        </div>
+        <div class="section-label">Session log</div>
+        <div class="card" id="timer-log-cd"><div style="font-size:13px;color:var(--text-3);">No sessions yet.</div></div>
       </div>
-      <div class="section-label">Session log</div>
-      <div class="card" id="timer-log"><div style="font-size:13px;color:var(--text-3);">No sessions yet.</div></div>
+
+      <!-- STOPWATCH SUB-TAB -->
+      <div id="tsub-stopwatch-panel" style="display:none;">
+        <div class="timer-face">
+          <div class="timer-digits" id="timer-digits-sw">00:00</div>
+          <div class="timer-sublabel">Stopwatch</div>
+        </div>
+        <div class="timer-ctrls">
+          <button class="btn-sm" onclick="resetStopwatch()">↺ Reset</button>
+          <button class="btn-sm primary" id="start-btn-sw" onclick="toggleStopwatch()">▶ Start</button>
+        </div>
+        <div class="section-label">Session log</div>
+        <div class="card" id="timer-log-sw"><div style="font-size:13px;color:var(--text-3);">No sessions yet.</div></div>
+      </div>
     </div>
 
     <!-- CALENDAR TAB -->
@@ -605,59 +657,180 @@ window.switchTab = function(name) {
   document.getElementById('tab-'+name).classList.add('active');
   const tabs=['courses','schedule','todos','timer','calendar','help'];
   document.querySelectorAll('.nav-btn')[tabs.indexOf(name)].classList.add('active');
+  if(name==='timer') startClock();
 };
 
-window.setMode = function(mode) {
-  timerMode=mode; clearInterval(timerInterval); timerRunning=false;
-  document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('mode-'+mode).classList.add('active');
-  document.getElementById('countdown-set').style.display=mode==='countdown'?'block':'none';
-  document.getElementById('pom-dots').style.display=mode==='pomodoro'?'flex':'none';
-  resetTimer();
+// --- TIMER SUB-TABS ---
+window.switchTimerSub = function(name) {
+  ['clock','pomodoro','countdown','stopwatch'].forEach(n => {
+    document.getElementById('tsub-'+n+'-panel').style.display = n===name ? 'block' : 'none';
+    document.getElementById('tsub-'+n).classList.toggle('active', n===name);
+  });
+  if(name==='clock') startClock();
 };
+
+// --- ANALOG CLOCK ---
+let clockRAF = null;
+function startClock() {
+  if(clockRAF) cancelAnimationFrame(clockRAF);
+  drawClock();
+}
+function drawClock() {
+  const canvas = document.getElementById('analog-clock');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const cx = W/2, cy = H/2, r = W/2 - 16;
+  const now = new Date();
+  const hr = now.getHours() % 12, min = now.getMinutes(), sec = now.getSeconds();
+
+  // Update digital displays
+  const h12 = hr === 0 ? 12 : hr;
+  const ampm = now.getHours() < 12 ? 'AM' : 'PM';
+  document.getElementById('clock-digital').textContent = `${String(h12).padStart(2,'0')}:${String(min).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+  document.getElementById('clock-ampm').textContent = ampm;
+  const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('clock-daydate').textContent = days[now.getDay()];
+  document.getElementById('clock-fulldate').textContent = `${months[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
+
+  ctx.clearRect(0, 0, W, H);
+
+  // Face
+  ctx.beginPath(); ctx.arc(cx, cy, r, 0, 2*Math.PI);
+  ctx.fillStyle = '#FFFFFF'; ctx.fill();
+  ctx.strokeStyle = '#E4E2DC'; ctx.lineWidth = 2; ctx.stroke();
+
+  // Hour markers
+  for(let i=0; i<12; i++) {
+    const angle = (i/12)*2*Math.PI - Math.PI/2;
+    const isMajor = i%3===0;
+    const len = isMajor ? 14 : 8;
+    const x1 = cx + (r-4)*Math.cos(angle), y1 = cy + (r-4)*Math.sin(angle);
+    const x2 = cx + (r-4-len)*Math.cos(angle), y2 = cy + (r-4-len)*Math.sin(angle);
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2);
+    ctx.strokeStyle = isMajor ? '#1A1917' : '#C8C5BC';
+    ctx.lineWidth = isMajor ? 2.5 : 1.5; ctx.stroke();
+  }
+
+  // Hour numbers
+  ctx.fillStyle = '#1A1917'; ctx.font = '600 14px DM Sans, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  [12,3,6,9].forEach((n,i) => {
+    const angle = (i/4)*2*Math.PI - Math.PI/2;
+    const nr = r - 30;
+    ctx.fillText(String(n), cx + nr*Math.cos(angle), cy + nr*Math.sin(angle));
+  });
+
+  // Hour hand
+  const hrAngle = ((hr + min/60)/12)*2*Math.PI - Math.PI/2;
+  drawHand(ctx, cx, cy, hrAngle, r*0.52, 5, '#1A1917');
+
+  // Minute hand
+  const minAngle = ((min + sec/60)/60)*2*Math.PI - Math.PI/2;
+  drawHand(ctx, cx, cy, minAngle, r*0.72, 3.5, '#1A1917');
+
+  // Second hand
+  const secAngle = (sec/60)*2*Math.PI - Math.PI/2;
+  drawHand(ctx, cx, cy, secAngle, r*0.78, 1.5, '#185FA5');
+  // Second hand tail
+  ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx - Math.cos(secAngle)*r*0.2, cy - Math.sin(secAngle)*r*0.2);
+  ctx.strokeStyle = '#185FA5'; ctx.lineWidth = 1.5; ctx.stroke();
+
+  // Center dot
+  ctx.beginPath(); ctx.arc(cx, cy, 5, 0, 2*Math.PI);
+  ctx.fillStyle = '#185FA5'; ctx.fill();
+  ctx.beginPath(); ctx.arc(cx, cy, 2.5, 0, 2*Math.PI);
+  ctx.fillStyle = '#FFFFFF'; ctx.fill();
+
+  clockRAF = requestAnimationFrame(drawClock);
+}
+
+function drawHand(ctx, cx, cy, angle, length, width, color) {
+  ctx.beginPath();
+  ctx.moveTo(cx, cy);
+  ctx.lineTo(cx + length*Math.cos(angle), cy + length*Math.sin(angle));
+  ctx.strokeStyle = color; ctx.lineWidth = width;
+  ctx.lineCap = 'round'; ctx.stroke();
+}
+
+// --- POMODORO ---
+let pomInterval=null, pomRunning=false, pomSecs=25*60;
 window.resetTimer = function() {
-  clearInterval(timerInterval); timerRunning=false;
+  clearInterval(pomInterval); pomRunning=false;
   document.getElementById('start-btn').textContent='▶ Start';
-  if(timerMode==='pomodoro'){pomPhase='focus';timerSecs=25*60;document.getElementById('timer-sublabel').textContent='Focus session';renderPomDots();}
-  else if(timerMode==='countdown'){timerSecs=(parseInt(document.getElementById('countdown-mins').value)||30)*60;document.getElementById('timer-sublabel').textContent='Countdown';}
-  else{timerSecs=0;document.getElementById('timer-sublabel').textContent='Stopwatch';}
-  updateTimerDisplay();
+  pomPhase='focus'; pomSecs=25*60;
+  document.getElementById('timer-sublabel').textContent='Focus session';
+  renderPomDots(); updatePomDisplay();
 };
 window.toggleTimer = function() {
-  if(timerRunning){clearInterval(timerInterval);timerRunning=false;document.getElementById('start-btn').textContent='▶ Start';if(timerMode==='stopwatch')logSess('Stopwatch',timerSecs);}
-  else{timerRunning=true;document.getElementById('start-btn').textContent='⏸ Pause';timerInterval=setInterval(tick,1000);}
+  if(pomRunning){clearInterval(pomInterval);pomRunning=false;document.getElementById('start-btn').textContent='▶ Start';}
+  else{pomRunning=true;document.getElementById('start-btn').textContent='⏸ Pause';pomInterval=setInterval(pomTick,1000);}
 };
-function tick() {
-  if(timerMode==='stopwatch'){timerSecs++;updateTimerDisplay();return;}
-  timerSecs--;
-  if(timerSecs<=0){
-    if(timerMode==='pomodoro'){
-      logSess(pomPhase==='focus'?'Focus block':'Break',pomPhase==='focus'?25*60:5*60);
-      if(pomPhase==='focus'){pomCount++;pomPhase='break';timerSecs=5*60;document.getElementById('timer-sublabel').textContent='Break time! 🎉';}
-      else{pomPhase='focus';timerSecs=25*60;document.getElementById('timer-sublabel').textContent='Focus session';}
-      renderPomDots();
-    } else {
-      logSess('Countdown',(parseInt(document.getElementById('countdown-mins').value)||30)*60);
-      clearInterval(timerInterval);timerRunning=false;timerSecs=0;
-      document.getElementById('start-btn').textContent='▶ Start';
-    }
+function pomTick() {
+  pomSecs--;
+  if(pomSecs<=0){
+    logSess(pomPhase==='focus'?'Focus block':'Break', pomPhase==='focus'?25*60:5*60, 'timer-log');
+    if(pomPhase==='focus'){pomCount++;pomPhase='break';pomSecs=5*60;document.getElementById('timer-sublabel').textContent='Break time! 🎉';}
+    else{pomPhase='focus';pomSecs=25*60;document.getElementById('timer-sublabel').textContent='Focus session';}
+    renderPomDots();
   }
-  updateTimerDisplay();
+  updatePomDisplay();
 }
-function updateTimerDisplay(){const m=Math.floor(Math.abs(timerSecs)/60),s=Math.abs(timerSecs)%60;document.getElementById('timer-digits').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');}
+function updatePomDisplay(){const m=Math.floor(pomSecs/60),s=pomSecs%60;document.getElementById('timer-digits').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');}
 function renderPomDots(){document.getElementById('pom-dots').innerHTML=Array.from({length:4},(_,i)=>`<div class="pom-dot ${i<pomCount?'done':''}"></div>`).join('');}
-function logSess(type,secs){
+
+// --- COUNTDOWN ---
+let cdInterval=null, cdRunning=false, cdSecs=30*60;
+window.resetCountdown = function() {
+  clearInterval(cdInterval); cdRunning=false;
+  document.getElementById('start-btn-cd').textContent='▶ Start';
+  cdSecs=(parseInt(document.getElementById('countdown-mins').value)||30)*60;
+  updateCdDisplay();
+};
+window.toggleCountdown = function() {
+  if(cdRunning){clearInterval(cdInterval);cdRunning=false;document.getElementById('start-btn-cd').textContent='▶ Start';}
+  else{cdRunning=true;document.getElementById('start-btn-cd').textContent='⏸ Pause';cdInterval=setInterval(cdTick,1000);}
+};
+function cdTick() {
+  cdSecs--;
+  if(cdSecs<=0){
+    logSess('Countdown',(parseInt(document.getElementById('countdown-mins').value)||30)*60,'timer-log-cd');
+    clearInterval(cdInterval);cdRunning=false;cdSecs=0;
+    document.getElementById('start-btn-cd').textContent='▶ Start';
+    document.getElementById('timer-sublabel-cd').textContent='Done! ✓';
+  }
+  updateCdDisplay();
+}
+function updateCdDisplay(){const m=Math.floor(cdSecs/60),s=cdSecs%60;document.getElementById('timer-digits-cd').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');}
+
+// --- STOPWATCH ---
+let swInterval=null, swRunning=false, swSecs=0;
+window.resetStopwatch = function() {
+  clearInterval(swInterval); swRunning=false; swSecs=0;
+  document.getElementById('start-btn-sw').textContent='▶ Start';
+  updateSwDisplay();
+};
+window.toggleStopwatch = function() {
+  if(swRunning){clearInterval(swInterval);swRunning=false;document.getElementById('start-btn-sw').textContent='▶ Start';logSess('Stopwatch',swSecs,'timer-log-sw');}
+  else{swRunning=true;document.getElementById('start-btn-sw').textContent='⏸ Pause';swInterval=setInterval(swTick,1000);}
+};
+function swTick(){swSecs++;updateSwDisplay();}
+function updateSwDisplay(){const m=Math.floor(swSecs/60),s=swSecs%60;document.getElementById('timer-digits-sw').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');}
+
+function logSess(type,secs,logId){
   if(!state.timerLog)state.timerLog=[];
   const m=Math.floor(secs/60),s=secs%60,now=new Date();
   state.timerLog.unshift({type,duration:`${m}m ${s}s`,time:`${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}`});
-  if(state.timerLog.length>20)state.timerLog=state.timerLog.slice(0,20);
-  renderTimerLog();saveState();
+  if(state.timerLog.length>30)state.timerLog=state.timerLog.slice(0,30);
+  renderTimerLog(); saveState();
 }
 function renderTimerLog(){
-  const el=document.getElementById('timer-log');
-  const entries=state.timerLog||[];
-  if(!entries.length){el.innerHTML='<div style="font-size:13px;color:var(--text-3);">No sessions yet.</div>';return;}
-  el.innerHTML=entries.map(e=>`<div class="log-entry"><span>${e.type}</span><span>${e.duration} · ${e.time}</span></div>`).join('');
+  ['timer-log','timer-log-cd','timer-log-sw'].forEach(id=>{
+    const el=document.getElementById(id); if(!el)return;
+    const entries=state.timerLog||[];
+    if(!entries.length){el.innerHTML='<div style="font-size:13px;color:var(--text-3);">No sessions yet.</div>';return;}
+    el.innerHTML=entries.map(e=>`<div class="log-entry"><span>${e.type}</span><span>${e.duration} · ${e.time}</span></div>`).join('');
+  });
 }
 
 function daysFromNow(d){const today=new Date();today.setHours(0,0,0,0);return Math.round((new Date(d+'T12:00:00')-today)/(864e5));}
@@ -744,6 +917,8 @@ window.clearHelp = function(){
 };
 
 renderPomDots();
+renderTimerLog();
+startClock();
 </script>
 </body>
 </html>
