@@ -107,10 +107,10 @@ textarea.note:focus { outline: none; border-color: var(--blue); }
 /* SCHEDULE GRID */
 .sg-wrap { overflow-x: auto; margin-bottom: 1.25rem; }
 .schedule-grid { display: grid; grid-template-columns: 80px repeat(5, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; min-width: 460px; }
-.sg-cell { background: var(--surface); padding: 5px 5px; font-size: 11px; min-height: 32px; display: flex; align-items: center; justify-content: center; }
+.sg-cell { background: var(--surface); padding: 4px 4px; font-size: 11px; min-height: 40px; display: flex; align-items: center; justify-content: center; }
 .sg-hdr { background: var(--bg); font-weight: 600; font-size: 11px; color: var(--text-2); }
 .sg-time { background: var(--bg); font-size: 10px; color: var(--text-3); justify-content: flex-start; padding-left: 8px; }
-.sg-block { border-radius: 4px; padding: 3px 5px; font-size: 10px; font-weight: 600; width: 100%; text-align: center; line-height: 1.3; }
+.sg-block { border-radius: 4px; padding: 3px 4px; font-size: 10px; font-weight: 600; width: 100%; text-align: center; line-height: 1.2; word-break: break-word; overflow-wrap: anywhere; }
 
 /* CREDITS TABLE */
 .credit-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
@@ -166,7 +166,51 @@ select { font-size: 13px; padding: 7px 8px; border: 1px solid var(--border); bor
 .help-flag-btn:hover { background: #FFF3CD; border-color: #D4A800; }
 .help-flag-btn.flagged { background: #FFF3CD; border-style: solid; border-color: #D4A800; }
 
-@media (max-width: 600px) {
+.note-toolbar { display:flex; align-items:center; gap:4px; padding:6px 8px; background:var(--bg); border:1px solid var(--border); border-radius:var(--radius-sm) var(--radius-sm) 0 0; flex-wrap:wrap; }
+.toolbar-btn { font-size:12px; padding:4px 8px; border:1px solid var(--border); border-radius:4px; background:var(--surface); cursor:pointer; color:var(--text); font-family:inherit; line-height:1.4; }
+.toolbar-btn:hover { background:var(--blue-light); border-color:var(--blue); color:var(--blue); }
+.toolbar-sep { width:1px; height:18px; background:var(--border); margin:0 2px; }
+.highlight-btn { background:#FFF9C4; border-color:#D4B800; color:#7A6500; }
+.note-editor { min-height:160px; padding:12px; border:1px solid var(--border); border-top:none; border-radius:0 0 var(--radius-sm) var(--radius-sm); background:var(--surface); color:var(--text); font-size:14px; line-height:1.7; outline:none; font-family:inherit; }
+.note-editor:empty::before { content:attr(data-placeholder); color:var(--text-3); pointer-events:none; }
+.note-editor h3 { font-size:15px; font-weight:700; margin:8px 0 4px; color:var(--text); }
+.note-editor ul { padding-left:20px; margin:4px 0; }
+.note-editor ol { padding-left:20px; margin:4px 0; }
+.note-editor li { margin:2px 0; }
+.note-editor mark { background:#FFF59D; color:#5A4800; padding:0 2px; border-radius:2px; }
+.note-author-btn { font-size:12px; padding:5px 10px; border:1px solid var(--border); border-radius:99px; background:none; cursor:pointer; color:var(--text-2); font-family:inherit; }
+.note-author-btn.active { background:var(--blue); color:white; border-color:var(--blue); }
+.note-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); margin-bottom:10px; box-shadow:var(--shadow); overflow:hidden; }
+.note-card-header { display:flex; align-items:center; justify-content:space-between; padding:10px 14px; border-bottom:1px solid var(--border); background:var(--bg); }
+.note-card-meta { display:flex; align-items:center; gap:8px; }
+.note-card-date { font-size:13px; font-weight:600; color:var(--text); }
+.note-author-tag { font-size:11px; padding:2px 8px; border-radius:99px; font-weight:600; }
+.note-card-body { padding:12px 14px; font-size:14px; line-height:1.7; color:var(--text); }
+.note-card-body h3 { font-size:15px; font-weight:700; margin:6px 0 4px; }
+.note-card-body ul { padding-left:20px; margin:4px 0; }
+.note-card-body ol { padding-left:20px; margin:4px 0; }
+.note-card-body mark { background:#FFF59D; color:#5A4800; padding:0 2px; border-radius:2px; }
+.note-search-highlight { background:#FFE082; border-radius:2px; }
+ padding:6px 12px; border:1px solid var(--border); border-radius:99px; background:var(--surface); cursor:pointer; color:var(--text-2); font-family:inherit; transition:all 0.15s; }
+.syl-btn:hover { background:var(--bg); color:var(--text); }
+.syl-btn.active { background:var(--blue); color:white; border-color:var(--blue); }
+.syl-header { border:1px solid; border-radius:var(--radius) var(--radius) 0 0; padding:1.25rem 1.5rem; }
+.syl-course-title { font-size:20px; font-weight:700; margin-bottom:4px; }
+.syl-meta { font-size:12px; color:var(--text-2); }
+.syl-body { background:var(--surface); border:1px solid var(--border); border-top:none; border-radius:0 0 var(--radius) var(--radius); padding:1.25rem 1.5rem; box-shadow:var(--shadow); }
+.syl-section { margin-bottom:1.25rem; }
+.syl-section:last-child { margin-bottom:0; }
+.syl-section-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:var(--text-3); margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid var(--border); }
+.syl-section p { font-size:14px; color:var(--text-2); line-height:1.6; }
+.syl-two-col { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; }
+.syl-grade-item { display:flex; align-items:center; gap:8px; font-size:13px; padding:6px 10px; background:var(--bg); border-radius:var(--radius-sm); }
+.syl-pct { font-size:15px; font-weight:700; color:var(--blue); min-width:36px; }
+.syl-unit { margin-bottom:10px; padding:10px 12px; background:var(--bg); border-radius:var(--radius-sm); border-left:3px solid var(--border); }
+.syl-unit-title { font-size:13px; font-weight:600; color:var(--text); margin-bottom:4px; }
+.syl-unit p { font-size:13px; color:var(--text-2); line-height:1.5; margin:0; }
+.syl-placeholder { text-align:center; padding:3rem 1rem; color:var(--text-2); }
+@media (max-width: 600px) { .syl-two-col { grid-template-columns:1fr; } }
+
   .main { padding: 1rem; }
   .stat-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
   .timer-digits { font-size: 48px; }
@@ -203,8 +247,9 @@ select { font-size: 13px; padding: 7px 8px; border: 1px solid var(--border); bor
   <!-- NAV -->
   <nav class="nav">
     <button class="nav-btn active" onclick="switchTab('courses')">📚 Courses</button>
+    <button class="nav-btn" onclick="switchTab('notes')">📝 Class Notes</button>
     <button class="nav-btn" onclick="switchTab('schedule')">📅 Schedule</button>
-    <button class="nav-btn" onclick="switchTab('todos')">✅ To-Do</button>
+    <button class="nav-btn" onclick="switchTab('syllabus')">📋 Syllabus</button>
     <button class="nav-btn" onclick="switchTab('timer')">⏱ Timers</button>
     <button class="nav-btn" onclick="switchTab('calendar')">🗓 Dates</button>
     <button class="nav-btn" onclick="switchTab('help')">🙋 Help</button>
@@ -218,9 +263,130 @@ select { font-size: 13px; padding: 7px 8px; border: 1px solid var(--border); bor
       <div class="stat-grid" id="stat-grid"></div>
       <div class="section-label">Subjects</div>
       <div id="subjects-list"></div>
+
+      <!-- TO-DO SECTION (merged into Courses) -->
+      <div style="margin-top:1.5rem;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+          <div class="section-label" style="margin-bottom:0;">General To-Dos</div>
+          <button onclick="toggleTodoForm()" id="todo-add-btn" class="btn-sm primary" style="font-size:12px;padding:5px 12px;">+ Add Task</button>
+        </div>
+        <div id="todo-form-wrap" style="display:none;margin-bottom:12px;">
+          <div class="card">
+            <div class="todo-form">
+              <input id="todo-input" placeholder="New task…" onkeydown="if(event.key==='Enter')addTodo()">
+              <select id="todo-subject"></select>
+              <button class="btn-sm primary" onclick="addTodo()">Add</button>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:8px;">
+              <span style="font-size:12px;color:var(--text-2);">Priority:</span>
+              <select id="todo-priority"><option value="normal">Normal</option><option value="high">High</option><option value="low">Low</option></select>
+              <button class="btn-sm" onclick="toggleTodoForm()" style="margin-left:auto;font-size:12px;">Cancel</button>
+            </div>
+          </div>
+        </div>
+        <div class="section-label" style="font-size:10px;margin-bottom:6px;">Open</div>
+        <div class="card" id="todo-open"></div>
+        <div class="section-label" style="font-size:10px;margin-top:1rem;margin-bottom:6px;">Completed</div>
+        <div class="card" id="todo-done"></div>
+      </div>
     </div>
 
-    <!-- SCHEDULE TAB -->
+    <!-- CLASS NOTES TAB -->
+    <div id="tab-notes" class="tab">
+      <div class="card" style="margin-bottom:1.25rem;padding:12px 14px;">
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          <div style="position:relative;flex:1;min-width:180px;">
+            <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text-3);font-size:14px;">🔍</span>
+            <input id="notes-search" placeholder="Search notes…" oninput="filterNotes()"
+              style="width:100%;font-size:13px;padding:7px 10px 7px 32px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);font-family:inherit;">
+          </div>
+          <select id="notes-filter-author" onchange="filterNotes()"
+            style="font-size:13px;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);font-family:inherit;">
+            <option value="">All authors</option>
+            <option value="Caden">Caden</option>
+            <option value="Mom">Mom</option>
+            <option value="Dad">Dad</option>
+          </select>
+          <select id="notes-filter-subject" onchange="filterNotes()"
+            style="font-size:13px;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);font-family:inherit;">
+            <option value="">All subjects</option>
+          </select>
+        </div>
+        <div id="notes-result-count" style="font-size:12px;color:var(--text-3);margin-top:8px;display:none;"></div>
+      </div>
+
+      <div style="margin-bottom:1.25rem;">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text-3);margin-bottom:6px;">Core Classes</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;">
+          <button class="syl-btn active" onclick="selectNoteSubject('worldhistory',this)">World History</button>
+          <button class="syl-btn" onclick="selectNoteSubject('ushistory',this)">US History</button>
+          <button class="syl-btn" onclick="selectNoteSubject('eng11',this)">Eng 11 A/B</button>
+          <button class="syl-btn" onclick="selectNoteSubject('personalfin',this)">Personal Finance</button>
+        </div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text-3);margin-bottom:6px;">Non-Core Classes</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;">
+          <button class="syl-btn" onclick="selectNoteSubject('commservices',this)">Comm Services</button>
+          <button class="syl-btn" onclick="selectNoteSubject('pe',this)">PE</button>
+          <button class="syl-btn" onclick="selectNoteSubject('jrtransition',this)">Jr Transition</button>
+          <button class="syl-btn" onclick="selectNoteSubject('heartful',this)">Heartful Life</button>
+        </div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text-3);margin-bottom:6px;">Non-Credit Sessions</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+          <button class="syl-btn" onclick="selectNoteSubject('dadtutorial',this)">Dad Tutorial</button>
+          <button class="syl-btn" onclick="selectNoteSubject('momtutorial',this)">Mom Tutorial</button>
+          <button class="syl-btn" onclick="selectNoteSubject('studyhr',this)">Study/Reading</button>
+          <button class="syl-btn" onclick="selectNoteSubject('socialskills',this)">Social Skills</button>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:1.25rem;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+          <div style="font-size:14px;font-weight:600;color:var(--text);" id="new-note-subject-label">World History</div>
+          <button onclick="toggleNoteForm()" id="note-form-toggle-btn" class="btn-sm primary" style="font-size:12px;padding:5px 12px;">+ Add Note</button>
+        </div>
+        <div id="note-form-wrap" style="display:none;margin-top:12px;border-top:1px solid var(--border);padding-top:12px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
+            <div>
+              <div class="section-label" style="margin-bottom:4px;">Date</div>
+              <input type="date" id="note-date" style="width:100%;font-size:13px;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);font-family:inherit;">
+            </div>
+            <div>
+              <div class="section-label" style="margin-bottom:4px;">Author</div>
+              <div style="display:flex;gap:6px;">
+                <button class="note-author-btn active" data-author="Caden" onclick="selectAuthor(this)">Caden</button>
+                <button class="note-author-btn" data-author="Mom" onclick="selectAuthor(this)">Mom</button>
+                <button class="note-author-btn" data-author="Dad" onclick="selectAuthor(this)">Dad</button>
+              </div>
+            </div>
+          </div>
+          <div class="note-toolbar">
+            <button class="toolbar-btn" onmousedown="event.preventDefault();noteFormat('bold')" title="Bold"><b>B</b></button>
+            <button class="toolbar-btn" onmousedown="event.preventDefault();noteFormat('italic')" title="Italic"><i>I</i></button>
+            <button class="toolbar-btn" onmousedown="event.preventDefault();noteFormat('underline')" title="Underline"><u>U</u></button>
+            <div class="toolbar-sep"></div>
+            <button class="toolbar-btn" onmousedown="event.preventDefault();noteFormat('insertUnorderedList')" title="Bullet list">• List</button>
+            <button class="toolbar-btn" onmousedown="event.preventDefault();noteFormat('insertOrderedList')" title="1. List">1. List</button>
+            <div class="toolbar-sep"></div>
+            <button class="toolbar-btn" onmousedown="event.preventDefault();noteFormatBlock('H3')" title="Heading"><b>H</b></button>
+            <button class="toolbar-btn" onmousedown="event.preventDefault();noteFormatBlock('P')" title="Normal">¶</button>
+            <div class="toolbar-sep"></div>
+            <button class="toolbar-btn highlight-btn" onmousedown="event.preventDefault();noteHighlight()" title="Highlight key term">🖊 Key</button>
+          </div>
+          <div id="note-editor" contenteditable="true" class="note-editor" data-placeholder="Start typing your class notes here…"></div>
+          <div style="display:flex;gap:8px;margin-top:10px;">
+            <button class="btn-sm primary" onclick="saveClassNote()" style="flex:1;">Save Note</button>
+            <button class="btn-sm" onclick="toggleNoteForm()">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <div class="section-label" style="margin-bottom:0;" id="notes-list-label">World History — Notes</div>
+        <div id="notes-count-badge" style="font-size:12px;color:var(--text-3);"></div>
+      </div>
+      <div id="notes-list"></div>
+    </div>
+
     <div id="tab-schedule" class="tab">
       <div class="section-label">Weekly class schedule — Fall 2026</div>
       <div class="sg-wrap"><div class="schedule-grid" id="schedule-grid"></div></div>
@@ -232,7 +398,7 @@ select { font-size: 13px; padding: 7px 8px; border: 1px solid var(--border); bor
           <div><div class="section-label" style="margin-bottom:4px;">Day</div>
             <select id="sched-day" style="width:100%;"><option>Mon</option><option>Tue</option><option>Wed</option><option>Thu</option><option>Fri</option></select></div>
           <div><div class="section-label" style="margin-bottom:4px;">Time</div>
-            <select id="sched-time" style="width:100%;"><option>8am</option><option>9am</option><option>10am</option><option>11am</option><option>Noon</option><option>1pm</option><option>2pm</option><option>3pm</option><option>Flex</option></select></div>
+            <select id="sched-time" style="width:100%;"><option>9am</option><option>10am</option><option>11am</option><option>Noon</option><option>1pm</option><option>2pm</option><option>3pm</option><option>Flex</option></select></div>
           <div><div class="section-label" style="margin-bottom:4px;">Subject</div>
             <select id="sched-subj" style="width:100%;"><option value="">— clear —</option></select></div>
         </div>
@@ -240,24 +406,400 @@ select { font-size: 13px; padding: 7px 8px; border: 1px solid var(--border); bor
       </div>
     </div>
 
-    <!-- TO-DO TAB -->
-    <div id="tab-todos" class="tab">
-      <div class="section-label">Add task</div>
-      <div class="card" style="margin-bottom:1.25rem;">
-        <div class="todo-form">
-          <input id="todo-input" placeholder="New task…" onkeydown="if(event.key==='Enter')addTodo()">
-          <select id="todo-subject"></select>
-          <button class="btn-sm primary" onclick="addTodo()">Add</button>
+    <!-- SYLLABUS TAB -->
+    <div id="tab-syllabus" class="tab">
+
+      <!-- Category + course sub-tab bar -->
+      <div id="syl-nav" style="margin-bottom:1.25rem;">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text-3);margin-bottom:6px;">Core Classes</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;">
+          <button class="syl-btn active" onclick="showSyl('worldhistory')">World History</button>
+          <button class="syl-btn" onclick="showSyl('ushistory')">US History</button>
+          <button class="syl-btn" onclick="showSyl('eng11')">Eng 11 A/B</button>
+          <button class="syl-btn" onclick="showSyl('personalfin')">Personal Finance</button>
         </div>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <span style="font-size:12px;color:var(--text-2);">Priority:</span>
-          <select id="todo-priority"><option value="normal">Normal</option><option value="high">High</option><option value="low">Low</option></select>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text-3);margin-bottom:6px;">Non-Core Classes</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;">
+          <button class="syl-btn" onclick="showSyl('commservices')">Comm Services</button>
+          <button class="syl-btn" onclick="showSyl('pe')">PE</button>
+          <button class="syl-btn" onclick="showSyl('jrtransition')">Jr Transition</button>
+          <button class="syl-btn" onclick="showSyl('heartful')">Heartful Life</button>
+        </div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text-3);margin-bottom:6px;">Non-Credit Sessions</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+          <button class="syl-btn" onclick="showSyl('dadtutorial')">Dad Tutorial</button>
+          <button class="syl-btn" onclick="showSyl('momtutorial')">Mom Tutorial</button>
+          <button class="syl-btn" onclick="showSyl('studyhr')">Study/Reading</button>
+          <button class="syl-btn" onclick="showSyl('socialskills')">Social Skills</button>
         </div>
       </div>
-      <div class="section-label">Open tasks</div>
-      <div class="card" id="todo-open"></div>
-      <div class="section-label" style="margin-top:1rem;">Completed</div>
-      <div class="card" id="todo-done"></div>
+
+      <!-- WORLD HISTORY -->
+      <div id="syl-worldhistory" class="syl-panel">
+        <div class="syl-header" style="background:#FAEEDA;border-color:#D4A867;">
+          <div class="syl-course-title" style="color:#854F0B;">World History A &amp; B</div>
+          <div class="syl-meta">IEM Schools · Ocean Grove Charter School · 5.0 credits</div>
+        </div>
+        <div class="syl-body">
+          <div class="syl-section">
+            <div class="syl-section-title">Course Overview</div>
+            <p>Covers Modern World History following California Content Standards. Topics include the Renaissance, Reformation, American and French Revolutions, World Wars I and II, the Cold War, and the world since 1945. Students study world geography including latitude, longitude, time zones, and topographical maps.</p>
+          </div>
+          <div class="syl-section">
+            <div class="syl-section-title">Grading</div>
+            <div class="syl-two-col">
+              <div class="syl-grade-item"><span class="syl-pct">50%</span><span>Chapter Assignments</span></div>
+              <div class="syl-grade-item"><span class="syl-pct">50%</span><span>Chapter Reviews</span></div>
+            </div>
+          </div>
+          <div class="syl-section">
+            <div class="syl-section-title">Textbook</div>
+            <p>Pearson AGS World History Textbook and Student Workbook (available from Wieser Educational)</p>
+          </div>
+          <div class="syl-section">
+            <div class="syl-section-title">Semester A — Units</div>
+            <div class="syl-unit">
+              <div class="syl-unit-title">Unit 3: Early Modern Times (1348–1800)</div>
+              <p>The Renaissance, The Reformation, The New Science Era, Beginnings of Global Age, Age of Kings. Reading: chapters 14–18, workbook pp. 59–86. Chapter Reviews: Ch.14 p.348, Ch.15 p.372, Ch.16 p.394, Ch.17 p.424, Ch.18 p.454.</p>
+            </div>
+            <div class="syl-unit">
+              <div class="syl-unit-title">Unit 4: Enlightenment and Revolution (1687–1850)</div>
+              <p>Age of Reason, Revolutions and Napoleon, Industrial Revolution, Revolutions in Europe and Latin America. Reading: chapters 19–22, workbook pp. 87–104.</p>
+            </div>
+            <div class="syl-unit">
+              <div class="syl-unit-title">Unit 5: A New Global Age (1840–1914)</div>
+              <p>Nationalism and Imperialism. Reading: chapters 23–24, workbook pp. 105–110.</p>
+            </div>
+          </div>
+          <div class="syl-section">
+            <div class="syl-section-title">Semester B — Units</div>
+            <div class="syl-unit">
+              <div class="syl-unit-title">Unit 6: World Wars and Revolutions (1905–1945)</div>
+              <p>WWI, Russian Revolution, Nationalism, Totalitarianism, WWII and Aftermath. Reading: chapters 25–27, workbook pp. 111–129.</p>
+            </div>
+            <div class="syl-unit">
+              <div class="syl-unit-title">Unit 7: The World Since 1945 (1945–Present)</div>
+              <p>Cold War, New Nations, Developing World, The World Today. Reading: chapters 28–31, workbook pp. 130–147.</p>
+            </div>
+          </div>
+          <div class="syl-section">
+            <div class="syl-section-title">Assignment Types (each unit)</div>
+            <p>Short answer · Vocabulary · Matching activities · Fill-in-the-blank sentences &amp; timelines · True/False Reading Checks · Written definitions of Key Terms · Chapter Review at end of each chapter</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- US HISTORY -->
+      <div id="syl-ushistory" class="syl-panel" style="display:none;">
+        <div class="syl-header" style="background:#EEEDFE;border-color:#A09AE0;">
+          <div class="syl-course-title" style="color:#534AB7;">a-g US History (CBi)</div>
+          <div class="syl-meta">Mr. Apps · IEM Schools · 5.0 credits · Transcript: 3R1002 / 3R9002</div>
+        </div>
+        <div class="syl-body">
+          <div class="syl-section">
+            <div class="syl-section-title">Course Overview</div>
+            <p>Explores major events, personalities, and social, cultural, political, economic, and technological changes shaping US history — from the Colonial Era through contemporary America, with emphasis on the 20th and 21st centuries.</p>
+          </div>
+          <div class="syl-section">
+            <div class="syl-section-title">Grading — Semester A</div>
+            <div class="syl-two-col">
+              <div class="syl-grade-item"><span class="syl-pct">60%</span><span>Daily Work</span></div>
+              <div class="syl-grade-item"><span class="syl-pct">40%</span><span>Key Assignments</span></div>
+            </div>
+          </div>
+          <div class="syl-section">
+            <div class="syl-section-title">Grading — Semester B</div>
+            <div class="syl-two-col">
+              <div class="syl-grade-item"><span class="syl-pct">50%</span><span>Daily Work</span></div>
+              <div class="syl-grade-item"><span class="syl-pct">40%</span><span>Key Assignments</span></div>
+              <div class="syl-grade-item"><span class="syl-pct">10%</span><span>Final Exam or Project</span></div>
+            </div>
+          </div>
+          <div class="syl-section">
+            <div class="syl-section-title">Textbook</div>
+            <p>United States History: Modern Times (McGraw Hill ©2023) · ISBN 9781264949557 · Digital resources provided by instructor</p>
+          </div>
+          <div class="syl-section">
+            <div class="syl-section-title">Semester A Units</div>
+            <div class="syl-unit"><div class="syl-unit-title">Unit 1: A New Nation (3 weeks)</div><p>Colonial Era, American Revolution, Constitution, Civil War &amp; Reconstruction</p></div>
+            <div class="syl-unit"><div class="syl-unit-title">Unit 2: Industrialization (4 weeks)</div><p>Western Expansion, Immigration, Urbanization, Reform Movements</p></div>
+            <div class="syl-unit"><div class="syl-unit-title">Unit 3: Rise of the US as a World Power &amp; WWI (4 weeks)</div><p>American Imperialism, Spanish-American War, Panama Canal, WWI Home Front</p></div>
+            <div class="syl-unit"><div class="syl-unit-title">Unit 4: Progressive Era &amp; the 1920s (3 weeks)</div><p>Women's Suffrage, Harlem Renaissance, Prohibition, Mass Production</p></div>
+            <div class="syl-unit"><div class="syl-unit-title">Unit 5: The 1930s &amp; the New Deal (4 weeks)</div><p>Great Depression, Dust Bowl, FDR, New Deal Programs</p></div>
+          </div>
+          <div class="syl-section">
+            <div class="syl-section-title">Semester B Units</div>
+            <div class="syl-unit"><div class="syl-unit-title">Unit 6: World War II (3 weeks)</div><p>Pearl Harbor, Allied Strategy, Home Front, Holocaust, Atomic Bomb</p></div>
+            <div class="syl-unit"><div class="syl-unit-title">Unit 7: Cold War Foreign Policy (3 weeks)</div><p>Truman Doctrine, Korean &amp; Vietnam Wars, Cuban Missile Crisis, Soviet Collapse</p></div>
+            <div class="syl-unit"><div class="syl-unit-title">Unit 8: Domestic Issues After WWII (4 weeks)</div><p>Post-War Society, Presidents Truman–Johnson, Great Society, Space Race</p></div>
+            <div class="syl-unit"><div class="syl-unit-title">Unit 9: Movements for Civil Rights (4 weeks)</div><p>Civil Rights Movement, MLK, Women's, Latino, Disability, LGBTQ Rights</p></div>
+            <div class="syl-unit"><div class="syl-unit-title">Unit 10: Contemporary United States (4 weeks)</div><p>Watergate, Reagan, 9/11, Great Recession, Obama, Trump</p></div>
+          </div>
+          <div class="syl-section">
+            <div class="syl-section-title">Key Assignment Options (each unit)</div>
+            <p>Essay · Timeline · Multimedia Presentation · Political Cartoons · Document-Based Questions · Student-created project with ES approval</p>
+          </div>
+          <div class="syl-section">
+            <div class="syl-section-title">Final (Semester B)</div>
+            <p>Choose: Final Exam (multiple choice, short answer, essay — 3"×5" notecard allowed) OR Final Project (21st Century Issue essay/presentation, Newspaper Topics, or Decade Interview Project)</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ENG 11 -->
+      <div id="syl-eng11" class="syl-panel" style="display:none;">
+        <div class="syl-header" style="background:#EAF3DE;border-color:#90C060;">
+          <div class="syl-course-title" style="color:#3B6D11;">English 11 A/B</div>
+          <div class="syl-meta">IEM Schools · Ocean Grove Charter School · 5.0 credits</div>
+        </div>
+        <div class="syl-body">
+          <div class="syl-placeholder">
+            <div style="font-size:32px;margin-bottom:12px;">📄</div>
+            <div style="font-weight:600;margin-bottom:6px;">Syllabus not yet uploaded</div>
+            <div style="font-size:13px;color:var(--text-3);">Upload the Eng 11 A/B syllabus PDF and we'll add it here.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PERSONAL FINANCE -->
+      <div id="syl-personalfin" class="syl-panel" style="display:none;">
+        <div class="syl-header" style="background:#E6F1FB;border-color:#7AB5E0;">
+          <div class="syl-course-title" style="color:#185FA5;">Personal Finance 1A/1B</div>
+          <div class="syl-meta">Yolanda Hedtke · IEM Schools · 5.0 credits · Course #2E0011</div>
+        </div>
+        <div class="syl-body">
+          <div class="syl-section">
+            <div class="syl-section-title">Course Description</div>
+            <p>A year-long course covering all essential personal finance topics necessary to become a financially capable student. By the end, students will have a thorough understanding of personal finance and be prepared for financial responsibilities after graduation.</p>
+          </div>
+          <div class="syl-section">
+            <div class="syl-section-title">Grading</div>
+            <p>Daily exit tickets and end-of-unit tests. See Schoology for full grading details.</p>
+          </div>
+          <div class="syl-section">
+            <div class="syl-section-title">Materials</div>
+            <p>All materials provided during lessons and/or located in Schoology. No purchase required.</p>
+          </div>
+          <div class="syl-section">
+            <div class="syl-section-title">Units</div>
+            <div class="syl-unit"><div class="syl-unit-title">Unit 1: Behavioral Economics</div><p>How cognitive biases and outside influences affect financial decisions</p></div>
+            <div class="syl-unit"><div class="syl-unit-title">Unit 2: Banking</div><p>Bank accounts, why and how to save</p></div>
+            <div class="syl-unit"><div class="syl-unit-title">Unit 3: Investing</div><p>Stock market, investment strategies, and retirement planning</p></div>
+            <div class="syl-unit"><div class="syl-unit-title">Unit 4: Types of Credit</div><p>Credit, credit cards, and loans</p></div>
+            <div class="syl-unit"><div class="syl-unit-title">Unit 5: Managing Credit</div><p>Credit score management and debt</p></div>
+            <div class="syl-unit"><div class="syl-unit-title">Unit 6: Paying for College</div><p>Scholarships, grants, student loans, and repayment</p></div>
+            <div class="syl-unit"><div class="syl-unit-title">Unit 7: Career</div><p>Job search, cover letters, resumes, interviews, and succeeding at work</p></div>
+            <div class="syl-unit"><div class="syl-unit-title">Unit 8: Insurance</div><p>Types of insurance and how they work</p></div>
+            <div class="syl-unit"><div class="syl-unit-title">Unit 9: Taxes</div><p>US tax system and filing a tax return</p></div>
+            <div class="syl-unit"><div class="syl-unit-title">Unit 10: Budgeting</div><p>Building budgets for all areas of life</p></div>
+            <div class="syl-unit"><div class="syl-unit-title">Unit 11: Consumer Skills</div><p>Savvy consumer skills, avoiding scams, fraud, and identity theft</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- COMM SERVICES -->
+      <div id="syl-commservices" class="syl-panel" style="display:none;">
+        <div class="syl-header" style="background:#F1EFE8;border-color:#C0BCB0;">
+          <div class="syl-course-title" style="color:#5F5E5A;">Community Service</div>
+          <div class="syl-meta">Young Men's Service League (YMSL) · Parent/Guardian supervised · 2.5 credits/semester · 5.0 credits full year</div>
+        </div>
+        <div class="syl-body">
+          <div class="syl-section">
+            <div class="syl-section-title">Course Overview</div>
+            <p>Awards academic credit for structured community service completed through the Young Men's Service League (YMSL), a nationally recognized nonprofit where mothers and sons volunteer together to support philanthropic organizations. Integrates authentic service, written reflection, and essential life skills into a year-long learning experience.</p>
+          </div>
+          <div class="syl-section">
+            <div class="syl-section-title">About YMSL</div>
+            <p>YMSL cultivates a spirit of giving back in young men by connecting them with meaningful service opportunities. Students engage with more than 30 philanthropies and develop real-world capabilities alongside a community of peers.</p>
+          </div>
+          <div class="syl-section">
+            <div class="syl-section-title">Service Period &amp; Goals</div>
+            <div class="syl-two-col">
+              <div class="syl-grade-item"><span class="syl-pct" style="color:var(--gray);font-size:12px;">MIN</span><span>20 volunteer hours · 5 philanthropies</span></div>
+              <div class="syl-grade-item"><span class="syl-pct" style="color:#0F6E56;font-size:12px;">GOAL</span><span>Exceed hours · ~10 organizations</span></div>
+            </div>
+          </div>
+          <div class="syl-section">
+            <div class="syl-section-title">Grading</div>
+            <div class="syl-two-col">
+              <div class="syl-grade-item"><span class="syl-pct">30%</span><span>Volunteer Hours (20+ hrs, 5+ orgs)</span></div>
+              <div class="syl-grade-item"><span class="syl-pct">30%</span><span>Monthly Reflection Reports (12 total)</span></div>
+              <div class="syl-grade-item"><span class="syl-pct">20%</span><span>Breadth of Service (diverse orgs)</span></div>
+              <div class="syl-grade-item"><span class="syl-pct">10%</span><span>Life Skills Demonstration</span></div>
+              <div class="syl-grade-item"><span class="syl-pct">10%</span><span>Participation &amp; Consistency</span></div>
+            </div>
+          </div>
+          <div class="syl-section">
+            <div class="syl-section-title">Life Skills Developed</div>
+            <div class="syl-two-col">
+              <div class="syl-grade-item">✓ Public Speaking</div>
+              <div class="syl-grade-item">✓ Presentations &amp; Slide Prep</div>
+              <div class="syl-grade-item">✓ Written Communication</div>
+              <div class="syl-grade-item">✓ Team Building</div>
+              <div class="syl-grade-item">✓ Leadership &amp; Initiative</div>
+              <div class="syl-grade-item">✓ Empathy &amp; Civic Responsibility</div>
+              <div class="syl-grade-item">✓ Time Management</div>
+              <div class="syl-grade-item">✓ Professional Conduct</div>
+            </div>
+          </div>
+          <div class="syl-section">
+            <div class="syl-section-title">Monthly Reflection Reports</div>
+            <p>One written report due by the last day of each month for prior month's activities. Reports must identify each philanthropy served, describe volunteer activities, reflect on learnings, note challenges or moments of impact, and identify life skills practiced. 12 reports total (May 2025 – April 2026).</p>
+          </div>
+          <div class="syl-section">
+            <div class="syl-section-title">Annual Service Log</div>
+            <div id="ymsl-log"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PE -->
+      <div id="syl-pe" class="syl-panel" style="display:none;">
+        <div class="syl-header" style="background:#FAECE7;border-color:#E0A890;">
+          <div class="syl-course-title" style="color:#993C1D;">Physical Education</div>
+          <div class="syl-meta">IEM Schools · Ocean Grove Charter School · 5.0 credits</div>
+        </div>
+        <div class="syl-body">
+          <div class="syl-placeholder">
+            <div style="font-size:32px;margin-bottom:12px;">📄</div>
+            <div style="font-weight:600;margin-bottom:6px;">Syllabus not yet uploaded</div>
+            <div style="font-size:13px;color:var(--text-3);">Upload the PE syllabus PDF and we'll add it here.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- JR TRANSITION -->
+      <div id="syl-jrtransition" class="syl-panel" style="display:none;">
+        <div class="syl-header" style="background:#FBEAF0;border-color:#E0A0BE;">
+          <div class="syl-course-title" style="color:#993556;">Jr Transition Seminar</div>
+          <div class="syl-meta">IEM Schools · Ocean Grove Charter School · 2.5 credits</div>
+        </div>
+        <div class="syl-body">
+          <div class="syl-placeholder">
+            <div style="font-size:32px;margin-bottom:12px;">📄</div>
+            <div style="font-weight:600;margin-bottom:6px;">Syllabus not yet uploaded</div>
+            <div style="font-size:13px;color:var(--text-3);">Upload the Jr Transition Seminar syllabus PDF and we'll add it here.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HEARTFUL LIFE -->
+      <div id="syl-heartful" class="syl-panel" style="display:none;">
+        <div class="syl-header" style="background:#E1F5EE;border-color:#80C8A8;">
+          <div class="syl-course-title" style="color:#0F6E56;">Heartful Life Management (HELM)</div>
+          <div class="syl-meta">Claire Priddy · Ocean Grove Charter School · 2.5 credits/semester · Code: 2E7481/2E7482</div>
+        </div>
+        <div class="syl-body">
+          <div class="syl-section">
+            <div class="syl-section-title">Course Description</div>
+            <p>HELM develops strong social and emotional skills alongside academic excellence. Teaches practical skills to reduce stress, anxiety, and loneliness in a heart-based, nurturing environment. Covers self-development, happiness, prioritization, positivity, sleep, gratitude, embracing diversity, and coexisting with others.</p>
+          </div>
+          <div class="syl-section">
+            <div class="syl-section-title">Grading (each semester)</div>
+            <div class="syl-two-col">
+              <div class="syl-grade-item"><span class="syl-pct">5%</span><span>Discussion Thread</span></div>
+              <div class="syl-grade-item"><span class="syl-pct">25%</span><span>Journaling</span></div>
+              <div class="syl-grade-item"><span class="syl-pct">45%</span><span>Workbooks (Pear Deck)</span></div>
+              <div class="syl-grade-item"><span class="syl-pct">25%</span><span>Service Project</span></div>
+            </div>
+          </div>
+          <div class="syl-section">
+            <div class="syl-section-title">Semester 1 Units</div>
+            <div class="syl-unit"><div class="syl-unit-title">Unit 1: Introduction to Heartfulness and Relaxation</div><p>What is Heartful Silence? Why the heart? How to practice and integrate into daily routine.</p></div>
+            <div class="syl-unit"><div class="syl-unit-title">Unit 2: Deepening into Your Heart</div><p>Focus during Heartful Silence, time management, and transmission.</p></div>
+            <div class="syl-unit"><div class="syl-unit-title">Unit 3: Cleaning — Feeling Lighter</div><p>Managing thoughts and disturbances, introduction to cleaning technique.</p></div>
+            <div class="syl-unit"><div class="syl-unit-title">Unit 4: Self-Observation</div><p>PEMS method (Physical, Emotional, Mental, Self-development), journal writing, gratitude.</p></div>
+            <div class="syl-unit"><div class="syl-unit-title">Unit 5: Tuning Into Your Heart</div><p>Decision making — emotional vs. logical, breathing with awareness.</p></div>
+            <div class="syl-unit"><div class="syl-unit-title">Unit 6: Happiness Quotient</div><p>What brings happiness? Happiness and beauty in simplicity.</p></div>
+            <div class="syl-unit"><div class="syl-unit-title">Unit 7: Recap + Service Project</div><p>Review of all techniques. Service project due last day of semester.</p></div>
+          </div>
+          <div class="syl-section">
+            <div class="syl-section-title">Semester 2 Units</div>
+            <div class="syl-unit"><div class="syl-unit-title">Unit 1: Introduction to Heartfulness (Review)</div></div>
+            <div class="syl-unit"><div class="syl-unit-title">Unit 2: Importance of Prioritizing</div><p>Keeping priorities straight, beating procrastination, finding balance.</p></div>
+            <div class="syl-unit"><div class="syl-unit-title">Unit 3: Becoming Settled in Your SELF</div><p>Self-confidence, inner beauty, identity.</p></div>
+            <div class="syl-unit"><div class="syl-unit-title">Unit 4: Fostering Positivity</div><p>Power of positivity, conflict resolution, spreading positivity.</p></div>
+            <div class="syl-unit"><div class="syl-unit-title">Unit 5: Co-existing with Different Personalities</div><p>Personality types, embracing differences, handling criticism.</p></div>
+            <div class="syl-unit"><div class="syl-unit-title">Unit 6: Sleeping and Resting Well</div><p>Importance of sleep for teens, how relaxation helps.</p></div>
+            <div class="syl-unit"><div class="syl-unit-title">Unit 7: Attitude and Values for Excellence</div><p>Attitude for excellence, positive attitude and Heartful Silence.</p></div>
+            <div class="syl-unit"><div class="syl-unit-title">Unit 8: The Art of Silence + Service Project</div><p>Self-observation, introspection. Service project due last day of school.</p></div>
+          </div>
+          <div class="syl-section">
+            <div class="syl-section-title">Service Project</div>
+            <p>Each semester ends with a community service project connecting class learning to the community. Examples: stress reduction toolkit, relaxation playlist, teaching guided meditation, art party. Includes a 2–3 paragraph reflection essay.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- NON-CREDIT PLACEHOLDERS -->
+      <div id="syl-dadtutorial" class="syl-panel" style="display:none;">
+        <div class="syl-header" style="background:#DDEEFF;border-color:#88BBDD;">
+          <div class="syl-course-title" style="color:#0C447C;">Dad Tutorial</div>
+          <div class="syl-meta">Review sessions with Dad · Non-credit</div>
+        </div>
+        <div class="syl-body">
+          <div class="syl-section">
+            <div class="syl-section-title">About these sessions</div>
+            <p>One-on-one review sessions with Dad (Coach Ray) to reinforce learning, work through difficult concepts, and provide additional support across all subjects. Scheduled Tuesdays at 9am and Thursdays at 1pm.</p>
+          </div>
+          <div class="syl-section">
+            <div class="syl-section-title">Notes</div>
+            <textarea class="note" style="width:100%;min-height:120px;" placeholder="Add session notes, topics covered, goals…" onchange="saveSylNote('dadtutorial',this.value)"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div id="syl-momtutorial" class="syl-panel" style="display:none;">
+        <div class="syl-header" style="background:#F3E8FF;border-color:#C090DD;">
+          <div class="syl-course-title" style="color:#6B2D8B;">Mom Tutorial</div>
+          <div class="syl-meta">Review sessions with Pam · Non-credit</div>
+        </div>
+        <div class="syl-body">
+          <div class="syl-section">
+            <div class="syl-section-title">About these sessions</div>
+            <p>One-on-one review sessions with Pam to reinforce learning, work through difficult concepts, and provide additional support across all subjects. Scheduled Wednesdays at 1pm and Fridays at 9am.</p>
+          </div>
+          <div class="syl-section">
+            <div class="syl-section-title">Notes</div>
+            <textarea class="note" style="width:100%;min-height:120px;" placeholder="Add session notes, topics covered, goals…" onchange="saveSylNote('momtutorial',this.value)"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div id="syl-studyhr" class="syl-panel" style="display:none;">
+        <div class="syl-header" style="background:#E0F5EC;border-color:#80C8A0;">
+          <div class="syl-course-title" style="color:#2D6B4F;">Study / Reading</div>
+          <div class="syl-meta">Independent study time · Non-credit · Mon, Tue, Thu, Fri at 10am</div>
+        </div>
+        <div class="syl-body">
+          <div class="syl-section">
+            <div class="syl-section-title">About this block</div>
+            <p>Dedicated daily time for Caden to independently study, review material, complete readings, or work ahead on assignments. A quiet, focused block designed to build study habits and reinforce classroom learning.</p>
+          </div>
+          <div class="syl-section">
+            <div class="syl-section-title">Notes</div>
+            <textarea class="note" style="width:100%;min-height:120px;" placeholder="Add reading lists, study goals, strategies…" onchange="saveSylNote('studyhr',this.value)"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div id="syl-socialskills" class="syl-panel" style="display:none;">
+        <div class="syl-header" style="background:#FFF3DC;border-color:#D4A840;">
+          <div class="syl-course-title" style="color:#8B5E0C;">Social Skills</div>
+          <div class="syl-meta">Life skills development · Non-credit · Mondays at 1pm</div>
+        </div>
+        <div class="syl-body">
+          <div class="syl-section">
+            <div class="syl-section-title">About this session</div>
+            <p>A dedicated weekly session focused on helping Caden develop social skills and other important life learnings. Sessions may cover conversation skills, reading social cues, making and keeping friends, self-advocacy, and navigating everyday social situations.</p>
+          </div>
+          <div class="syl-section">
+            <div class="syl-section-title">Notes</div>
+            <textarea class="note" style="width:100%;min-height:120px;" placeholder="Add topics, activities, goals, progress notes…" onchange="saveSylNote('socialskills',this.value)"></textarea>
+          </div>
+        </div>
+      </div>
+
     </div>
 
     <!-- TIMER TAB -->
@@ -405,18 +947,22 @@ const db = getFirestore(app);
 const STATE_DOC = doc(db, 'dashboard', 'state');
 
 const SUBJECTS = [
-  {id:'worldhistory', name:'World History',         color:'#854F0B', bg:'#FAEEDA', sessions:[{day:'Mon',time:'8am',cr:2.5},{day:'Thu',time:'8am',cr:2.5}]},
-  {id:'eng11',        name:'Eng 11 A/B',            color:'#3B6D11', bg:'#EAF3DE', sessions:[{day:'Mon',time:'Noon',cr:2.5},{day:'Wed',time:'Noon',cr:2.5}]},
-  {id:'ushistory',    name:'US History',            color:'#534AB7', bg:'#EEEDFE', sessions:[{day:'Tue',time:'2pm',cr:2.5},{day:'Thu',time:'2pm',cr:2.5}]},
-  {id:'personalfin',  name:'Personal Finance',      color:'#185FA5', bg:'#E6F1FB', sessions:[{day:'Tue',time:'Noon',cr:2.5},{day:'Thu',time:'Noon',cr:2.5}]},
-  {id:'jrtransition', name:'Jr Transition Seminar', color:'#993556', bg:'#FBEAF0', sessions:[{day:'Wed',time:'8am',cr:2.5}]},
-  {id:'heartful',     name:'Heartful Life Mgmt',    color:'#0F6E56', bg:'#E1F5EE', sessions:[{day:'Wed',time:'9am',cr:2.5}]},
-  {id:'commservices', name:'Comm Services',         color:'#5F5E5A', bg:'#F1EFE8', sessions:[{day:'Mon',time:'Flex',cr:0.5},{day:'Tue',time:'Flex',cr:0.5},{day:'Wed',time:'Flex',cr:0.5},{day:'Thu',time:'Flex',cr:0.5},{day:'Fri',time:'Flex',cr:0.5}]},
-  {id:'pe',           name:'PE',                    color:'#993C1D', bg:'#FAECE7', sessions:[{day:'Mon',time:'Flex2',cr:1.0},{day:'Tue',time:'Flex2',cr:1.0},{day:'Wed',time:'Flex2',cr:1.0},{day:'Thu',time:'Flex2',cr:1.0},{day:'Fri',time:'Flex2',cr:1.0}]},
+  {id:'worldhistory', name:'World History',         color:'#854F0B', bg:'#FAEEDA', category:'core',      sessions:[{day:'Mon',time:'9am',cr:2.5},{day:'Thu',time:'9am',cr:2.5}]},
+  {id:'eng11',        name:'Eng 11 A/B',            color:'#3B6D11', bg:'#EAF3DE', category:'core',      sessions:[{day:'Mon',time:'Noon',cr:2.5},{day:'Wed',time:'Noon',cr:2.5}]},
+  {id:'ushistory',    name:'US History',            color:'#534AB7', bg:'#EEEDFE', category:'core',      sessions:[{day:'Tue',time:'2pm',cr:2.5},{day:'Thu',time:'2pm',cr:2.5}]},
+  {id:'personalfin',  name:'Personal Finance',      color:'#185FA5', bg:'#E6F1FB', category:'core',      sessions:[{day:'Tue',time:'Noon',cr:2.5},{day:'Thu',time:'Noon',cr:2.5}]},
+  {id:'commservices', name:'Comm Services',         color:'#5F5E5A', bg:'#F1EFE8', category:'noncore',   sessions:[{day:'Mon',time:'Flex',cr:2.5}]},
+  {id:'pe',           name:'PE',                    color:'#993C1D', bg:'#FAECE7', category:'noncore',   sessions:[{day:'Mon',time:'Flex2',cr:5.0}]},
+  {id:'jrtransition', name:'Jr Transition Seminar', color:'#993556', bg:'#FBEAF0', category:'noncore',   sessions:[{day:'Wed',time:'9am',cr:2.5}]},
+  {id:'heartful',     name:'Heartful Life Mgmt',    color:'#0F6E56', bg:'#E1F5EE', category:'noncore',   sessions:[{day:'Wed',time:'10am',cr:2.5}]},
+  {id:'dadtutorial',  name:'Dad Tutorial',          color:'#0C447C', bg:'#DDEEFF', category:'noncredit', sessions:[{day:'Tue',time:'9am',cr:0},{day:'Thu',time:'1pm',cr:0}]},
+  {id:'momtutorial',  name:'Mom Tutorial',          color:'#6B2D8B', bg:'#F3E8FF', category:'noncredit', sessions:[{day:'Fri',time:'9am',cr:0},{day:'Wed',time:'1pm',cr:0}]},
+  {id:'studyhr',      name:'Study/Reading',         color:'#2D6B4F', bg:'#E0F5EC', category:'noncredit', sessions:[{day:'Mon',time:'10am',cr:0},{day:'Tue',time:'10am',cr:0},{day:'Thu',time:'10am',cr:0},{day:'Fri',time:'10am',cr:0}]},
+  {id:'socialskills', name:'Social Skills',         color:'#8B5E0C', bg:'#FFF3DC', category:'noncredit', sessions:[{day:'Mon',time:'1pm',cr:0}]},
 ];
 
 const DAYS = ['Mon','Tue','Wed','Thu','Fri'];
-const TIMES = ['8am','9am','10am','11am','Noon','1pm','2pm','3pm','Flex'];
+const TIMES = ['9am','10am','11am','Noon','1pm','2pm','3pm','Flex'];
 
 const FIXED_EVENTS = [
   {id:'fe1',title:'First Semester begins',date:'2026-08-17',type:'semester',fixed:true,semester:1},
@@ -474,17 +1020,25 @@ async function saveState() {
   }, 800);
 }
 
+const SCHEDULE_VERSION = 7; // increment this to force-reset the schedule
+
 // Real-time listener
 onSnapshot(STATE_DOC, (snap) => {
   if (snap.exists()) {
     const remote = snap.data();
     state = remote;
-    if (!state.schedule) state.schedule = buildDefaultSchedule();
+    // Force reset schedule if version is outdated or missing
+    if (!state.schedule || !state.scheduleVersion || state.scheduleVersion < SCHEDULE_VERSION) {
+      state.schedule = buildDefaultSchedule();
+      state.scheduleVersion = SCHEDULE_VERSION;
+      setDoc(STATE_DOC, state); // push corrected schedule to Firebase
+    }
     if (!state.customEvents) state.customEvents = [];
     if (!state.todos) state.todos = [];
     if (!state.timerLog) state.timerLog = [];
   } else {
     state.schedule = buildDefaultSchedule();
+    state.scheduleVersion = SCHEDULE_VERSION;
   }
   renderAll();
   setSyncStatus('synced');
@@ -506,47 +1060,95 @@ function renderStats() {
     <div class="stat-card"><div class="stat-num">${open}</div><div class="stat-lbl">Open to-dos</div></div>`;
 }
 
+const CATEGORIES = [
+  { id:'core',      label:'Core Classes',        color:'#0C447C', bg:'#D6E8F7', border:'#A8CCE8', desc:'Credited academic courses' },
+  { id:'noncore',   label:'Non-Core Classes',    color:'#3D3B37', bg:'#E8E6E0', border:'#C8C4BA', desc:'Credited elective & enrichment' },
+  { id:'noncredit', label:'Non-Credit Sessions', color:'#1A5C3F', bg:'#D4EEE3', border:'#9DCFB8', desc:'Tutorials, study time & skills' },
+];
+
+function subjectCardHTML(s) {
+  const list = state.assignments[s.id]||[];
+  const done = list.filter(a=>a.done).length;
+  const pct = list.length ? Math.round(done/list.length*100) : 0;
+  const totalCr = semCr(s);
+  const crLabel = totalCr > 0 ? `${totalCr} cr` : '0 cr';
+  const crStyle = totalCr > 0
+    ? 'background:var(--blue-light);color:var(--blue-dark);'
+    : 'background:var(--gray-light);color:var(--gray);';
+  return `<div class="subject-card">
+    <div class="subject-header" onclick="toggleSub('${s.id}')">
+      <div class="subject-left">
+        <span class="subject-dot" style="background:${s.color}"></span>
+        <span class="subject-name">${s.name}</span>
+        <span class="cr-badge" style="${crStyle}">${crLabel}</span>
+      </div>
+      <div class="subject-right">
+        <span class="subject-count">${done}/${list.length}</span>
+        <span class="chevron" id="chev-${s.id}">›</span>
+      </div>
+    </div>
+    <div class="prog-bar"><div class="prog-fill" style="width:${pct}%;background:${s.color}"></div></div>
+    <div class="subject-body" id="body-${s.id}">
+      <div style="padding-top:10px;">
+      ${list.map((a,i) => `
+        <div class="assignment-row">
+          <div class="checkbox ${a.done?'done':''}" onclick="toggleA('${s.id}',${i})"></div>
+          <span class="a-name ${a.done?'done':''}">${a.name}</span>
+          <button class="del-btn" onclick="delA('${s.id}',${i})">×</button>
+        </div>`).join('')}
+      <div class="add-row" style="margin-top:${list.length?'10px':'0'}">
+        <input id="ai-${s.id}" placeholder="Add assignment…" onkeydown="if(event.key==='Enter')addA('${s.id}')">
+        <button class="btn-sm" onclick="addA('${s.id}')">Add</button>
+      </div>
+      <div style="margin-top:10px;"><div class="section-label" style="margin-bottom:4px;">Notes</div>
+        <textarea class="note" placeholder="Notes, resources, goals…" onchange="saveNote('${s.id}',this.value)">${state.assignments[s.id+'_note']||''}</textarea>
+      </div>
+      </div>
+    </div>
+  </div>`;
+}
+
 function renderSubjects() {
   const c = document.getElementById('subjects-list'); c.innerHTML = '';
-  SUBJECTS.forEach(s => {
-    const list = state.assignments[s.id]||[];
-    const done = list.filter(a=>a.done).length;
-    const pct = list.length ? Math.round(done/list.length*100) : 0;
-    const totalCr = semCr(s);
-    const d = document.createElement('div'); d.className = 'subject-card';
-    d.innerHTML = `
-      <div class="subject-header" onclick="toggleSub('${s.id}')">
-        <div class="subject-left">
-          <span class="subject-dot" style="background:${s.color}"></span>
-          <span class="subject-name">${s.name}</span>
-          <span class="cr-badge">${totalCr} cr</span>
+  CATEGORIES.forEach(cat => {
+    const catSubs = SUBJECTS.filter(s => s.category === cat.id);
+    const catTotal = catSubs.reduce((sum,s) => sum + (state.assignments[s.id]||[]).length, 0);
+    const catDone  = catSubs.reduce((sum,s) => sum + (state.assignments[s.id]||[]).filter(a=>a.done).length, 0);
+    const totalCr  = catSubs.reduce((sum,s) => sum + semCr(s), 0);
+
+    // Category header
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'margin-bottom:6px;margin-top:4px;';
+    hdr.innerHTML = `
+      <div onclick="toggleCat('${cat.id}')" style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:${cat.bg};border:1.5px solid ${cat.border};border-radius:var(--radius);cursor:pointer;box-shadow:var(--shadow);">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="width:12px;height:12px;border-radius:3px;background:${cat.color};display:inline-block;flex-shrink:0;"></span>
+          <span style="font-size:14px;font-weight:700;color:${cat.color};">${cat.label}</span>
+          ${totalCr > 0 ? `<span style="font-size:11px;padding:2px 8px;border-radius:99px;background:rgba(255,255,255,0.7);color:${cat.color};font-weight:700;border:1px solid ${cat.border};">${totalCr} cr</span>` : ''}
         </div>
-        <div class="subject-right">
-          <span class="subject-count">${done}/${list.length}</span>
-          <span class="chevron" id="chev-${s.id}">›</span>
-        </div>
-      </div>
-      <div class="prog-bar"><div class="prog-fill" style="width:${pct}%;background:${s.color}"></div></div>
-      <div class="subject-body" id="body-${s.id}">
-        <div style="padding-top:10px;">
-        ${list.map((a,i) => `
-          <div class="assignment-row">
-            <div class="checkbox ${a.done?'done':''}" onclick="toggleA('${s.id}',${i})"></div>
-            <span class="a-name ${a.done?'done':''}">${a.name}</span>
-            <button class="del-btn" onclick="delA('${s.id}',${i})">×</button>
-          </div>`).join('')}
-        <div class="add-row" style="margin-top:${list.length?'10px':'0'}">
-          <input id="ai-${s.id}" placeholder="Add assignment…" onkeydown="if(event.key==='Enter')addA('${s.id}')">
-          <button class="btn-sm" onclick="addA('${s.id}')">Add</button>
-        </div>
-        <div style="margin-top:10px;"><div class="section-label" style="margin-bottom:4px;">Notes</div>
-          <textarea class="note" placeholder="Notes, resources, goals…" onchange="saveNote('${s.id}',this.value)">${state.assignments[s.id+'_note']||''}</textarea>
-        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-size:12px;color:${cat.color};opacity:0.8;">${catDone}/${catTotal} tasks</span>
+          <span id="cat-chev-${cat.id}" style="font-size:18px;color:${cat.color};transition:transform 0.2s;display:inline-block;">›</span>
         </div>
       </div>`;
-    c.appendChild(d);
+    c.appendChild(hdr);
+
+    // Subject cards container
+    const container = document.createElement('div');
+    container.id = 'cat-body-' + cat.id;
+    container.style.cssText = 'padding-left:12px;margin-bottom:8px;';
+    container.innerHTML = catSubs.map(s => subjectCardHTML(s)).join('');
+    c.appendChild(container);
   });
 }
+
+window.toggleCat = function(id) {
+  const body = document.getElementById('cat-body-'+id);
+  const chev = document.getElementById('cat-chev-'+id);
+  const isOpen = body.style.display !== 'none';
+  body.style.display = isOpen ? 'none' : 'block';
+  chev.style.transform = isOpen ? '' : 'rotate(90deg)';
+};
 
 window.toggleSub = function(id) {
   const b = document.getElementById('body-'+id);
@@ -575,7 +1177,7 @@ function renderSchedule() {
         const c=document.createElement('div'); c.className='sg-cell'; c.style.cssText='display:flex;flex-direction:column;gap:2px;padding:3px;';
         const s1=SUBJECTS.find(s=>s.id===state.schedule[d+'|Flex']);
         const s2=SUBJECTS.find(s=>s.id===state.schedule[d+'|Flex2']);
-        if(s1) c.innerHTML+=`<div class="sg-block" style="background:${s1.bg};color:${s1.color};">${s1.name.split(' ')[0]}</div>`;
+        if(s1) c.innerHTML+=`<div class="sg-block" style="background:${s1.bg};color:${s1.color};">${s1.name}</div>`;
         if(s2) c.innerHTML+=`<div class="sg-block" style="background:${s2.bg};color:${s2.color};">${s2.name}</div>`;
         grid.appendChild(c);
       });
@@ -583,7 +1185,7 @@ function renderSchedule() {
       DAYS.forEach(d => {
         const sid=state.schedule[d+'|'+t]; const sub=SUBJECTS.find(s=>s.id===sid);
         const c=document.createElement('div'); c.className='sg-cell';
-        if(sub) c.innerHTML=`<div class="sg-block" style="background:${sub.bg};color:${sub.color};">${sub.name.split(' ').slice(0,2).join(' ')}</div>`;
+        if(sub) c.innerHTML=`<div class="sg-block" style="background:${sub.bg};color:${sub.color};">${sub.name}</div>`;
         grid.appendChild(c);
       });
     }
@@ -591,8 +1193,11 @@ function renderSchedule() {
 }
 
 function renderCredits() {
-  const grandTotal = SUBJECTS.reduce((sum,s)=>sum+semCr(s),0);
-  let html = SUBJECTS.map(s => {
+  const creditedSubs = SUBJECTS.filter(s => semCr(s) > 0);
+  const nonCreditSubs = SUBJECTS.filter(s => semCr(s) === 0);
+  const grandTotal = creditedSubs.reduce((sum,s)=>sum+semCr(s),0);
+
+  let html = creditedSubs.map(s => {
     const total = semCr(s);
     const detail = s.sessions.map(sess=>`${sess.day} (${sess.cr})`).join(' + ');
     return `<div class="credit-row">
@@ -601,14 +1206,29 @@ function renderCredits() {
       <div style="font-weight:600;min-width:28px;text-align:right;">${total}</div>
     </div>`;
   }).join('');
-  html += `<div class="credit-row" style="margin-top:4px;padding-top:12px;border-top:2px solid var(--border);border-bottom:none;">
-    <div style="font-weight:600;">Total fall semester</div><div style="font-weight:600;">${grandTotal}</div></div>`;
+
+  html += `<div class="credit-row" style="margin-top:4px;padding-top:12px;border-top:2px solid var(--border);border-bottom:1px solid var(--border);">
+    <div style="font-weight:600;">Total fall semester credits</div><div style="font-weight:600;">${grandTotal}</div></div>`;
+
+  if(nonCreditSubs.length) {
+    html += `<div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--text-3);margin:14px 0 8px;">Non-credit sessions</div>`;
+    html += nonCreditSubs.map(s => {
+      const detail = s.sessions.map(sess=>`${sess.day} ${sess.time}`).join(', ');
+      return `<div class="credit-row">
+        <div><div style="display:flex;align-items:center;gap:8px;"><span style="width:8px;height:8px;border-radius:50%;background:${s.color};display:inline-block;flex-shrink:0;"></span>${s.name}</div>
+        <div class="credit-detail">${detail}</div></div>
+        <div style="font-size:11px;color:var(--text-3);min-width:28px;text-align:right;">0 cr</div>
+      </div>`;
+    }).join('');
+  }
+
   document.getElementById('credits-list').innerHTML = html;
 }
 
 window.applyBlock = function() {
   const day=document.getElementById('sched-day').value, time=document.getElementById('sched-time').value, subj=document.getElementById('sched-subj').value;
   if(subj) state.schedule[day+'|'+time]=subj; else delete state.schedule[day+'|'+time];
+  state.scheduleVersion = SCHEDULE_VERSION;
   renderSchedule(); saveState();
 };
 
@@ -634,11 +1254,19 @@ function renderTodos() {
   mkList(todos.filter(t=>t.done),'todo-done');
 }
 
+window.toggleTodoForm = function() {
+  const wrap = document.getElementById('todo-form-wrap');
+  const isVisible = wrap.style.display !== 'none';
+  wrap.style.display = isVisible ? 'none' : 'block';
+  if (!isVisible) document.getElementById('todo-input').focus();
+};
 window.addTodo = function() {
   const inp=document.getElementById('todo-input'); const v=inp.value.trim(); if(!v) return;
   if(!state.todos) state.todos=[];
   state.todos.unshift({id:Date.now()+'',name:v,done:false,subject:document.getElementById('todo-subject').value,priority:document.getElementById('todo-priority').value});
-  inp.value=''; renderTodos();renderStats();saveState();
+  inp.value='';
+  document.getElementById('todo-form-wrap').style.display='none';
+  renderTodos();renderStats();saveState();
 };
 window.toggleTodo = function(id){const t=state.todos.find(t=>t.id===id);if(t){t.done=!t.done;renderTodos();renderStats();saveState();}};
 window.delTodo = function(id){state.todos=state.todos.filter(t=>t.id!==id);renderTodos();renderStats();saveState();};
@@ -655,9 +1283,268 @@ window.switchTab = function(name) {
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('tab-'+name).classList.add('active');
-  const tabs=['courses','schedule','todos','timer','calendar','help'];
+  const tabs=['courses','notes','schedule','syllabus','timer','calendar','help'];
   document.querySelectorAll('.nav-btn')[tabs.indexOf(name)].classList.add('active');
   if(name==='timer') startClock();
+  if(name==='notes') initNotesTab();
+};
+
+// =================== CLASS NOTES ===================
+let currentNoteSubject = 'worldhistory';
+
+const NOTE_SUBJECT_NAMES = {
+  worldhistory:'World History', ushistory:'US History', eng11:'Eng 11 A/B',
+  personalfin:'Personal Finance', commservices:'Comm Services', pe:'PE',
+  jrtransition:'Jr Transition Seminar', heartful:'Heartful Life Mgmt',
+  dadtutorial:'Dad Tutorial', momtutorial:'Mom Tutorial',
+  studyhr:'Study/Reading', socialskills:'Social Skills',
+};
+
+const AUTHOR_COLORS = {
+  Caden:{bg:'#E6F1FB',color:'#0C447C'},
+  Mom:{bg:'#F3E8FF',color:'#6B2D8B'},
+  Dad:{bg:'#DDEEFF',color:'#0C447C'},
+};
+
+function initNotesTab() {
+  // Set today's date as default
+  const di = document.getElementById('note-date');
+  if(di && !di.value) di.value = new Date().toISOString().split('T')[0];
+  // Populate subject filter dropdown
+  const sf = document.getElementById('notes-filter-subject');
+  if(sf && sf.options.length === 1) {
+    Object.entries(NOTE_SUBJECT_NAMES).forEach(([id,name]) => {
+      const o = document.createElement('option'); o.value=id; o.textContent=name; sf.appendChild(o);
+    });
+  }
+  renderNotesList();
+}
+
+window.selectNoteSubject = function(id, btn) {
+  currentNoteSubject = id;
+  document.querySelectorAll('#tab-notes .syl-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('new-note-subject-label').textContent = NOTE_SUBJECT_NAMES[id];
+  document.getElementById('notes-list-label').textContent = NOTE_SUBJECT_NAMES[id] + ' — Notes';
+  document.getElementById('note-form-wrap').style.display='none';
+  document.getElementById('note-form-toggle-btn').textContent='+ Add Note';
+  // Clear search when switching subject
+  document.getElementById('notes-search').value='';
+  document.getElementById('notes-filter-author').value='';
+  document.getElementById('notes-filter-subject').value='';
+  document.getElementById('notes-result-count').style.display='none';
+  renderNotesList();
+};
+
+window.toggleNoteForm = function() {
+  const wrap = document.getElementById('note-form-wrap');
+  const btn = document.getElementById('note-form-toggle-btn');
+  const isOpen = wrap.style.display !== 'none';
+  wrap.style.display = isOpen ? 'none' : 'block';
+  btn.textContent = isOpen ? '+ Add Note' : '✕ Close';
+  if(!isOpen) {
+    document.getElementById('note-editor').innerHTML = '';
+    const di = document.getElementById('note-date');
+    di.value = new Date().toISOString().split('T')[0];
+    document.getElementById('note-editor').focus();
+  }
+};
+
+window.selectAuthor = function(btn) {
+  document.querySelectorAll('.note-author-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+};
+
+window.noteFormat = function(cmd) {
+  document.getElementById('note-editor').focus();
+  document.execCommand(cmd, false, null);
+};
+
+window.noteFormatBlock = function(tag) {
+  document.getElementById('note-editor').focus();
+  document.execCommand('formatBlock', false, tag);
+};
+
+window.noteHighlight = function() {
+  document.getElementById('note-editor').focus();
+  const sel = window.getSelection();
+  if(sel && sel.toString().length > 0) {
+    document.execCommand('insertHTML', false, `<mark>${sel.toString()}</mark>`);
+  }
+};
+
+window.saveClassNote = function() {
+  const date = document.getElementById('note-date').value;
+  const authorBtn = document.querySelector('.note-author-btn.active');
+  const author = authorBtn ? authorBtn.dataset.author : 'Caden';
+  const content = document.getElementById('note-editor').innerHTML.trim();
+  if(!content || content === '<br>') { alert('Please write something before saving.'); return; }
+  if(!date) { alert('Please select a date.'); return; }
+  if(!state.classNotes) state.classNotes = [];
+  state.classNotes.unshift({
+    id: Date.now()+'',
+    subject: currentNoteSubject,
+    date, author, content,
+    created: new Date().toISOString()
+  });
+  document.getElementById('note-editor').innerHTML = '';
+  document.getElementById('note-form-wrap').style.display = 'none';
+  document.getElementById('note-form-toggle-btn').textContent = '+ Add Note';
+  renderNotesList();
+  saveState();
+};
+
+window.deleteClassNote = function(id) {
+  if(!confirm('Delete this note?')) return;
+  state.classNotes = (state.classNotes||[]).filter(n=>n.id!==id);
+  renderNotesList();
+  saveState();
+};
+
+function highlightText(html, term) {
+  if(!term) return html;
+  const safe = term.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  return html.replace(new RegExp(`(${safe})`, 'gi'), '<span class="note-search-highlight">$1</span>');
+}
+
+function renderNotesList() {
+  const list = document.getElementById('notes-list');
+  const badge = document.getElementById('notes-count-badge');
+  const searchTerm = (document.getElementById('notes-search')||{}).value?.toLowerCase()||'';
+  const filterAuthor = (document.getElementById('notes-filter-author')||{}).value||'';
+  const filterSubject = (document.getElementById('notes-filter-subject')||{}).value||'';
+  const isSearchMode = searchTerm || filterAuthor || filterSubject;
+
+  let notes = (state.classNotes||[]);
+
+  if(isSearchMode) {
+    // Show all notes matching filters/search
+    if(filterAuthor) notes = notes.filter(n=>n.author===filterAuthor);
+    if(filterSubject) notes = notes.filter(n=>n.subject===filterSubject);
+    if(searchTerm) notes = notes.filter(n=>
+      n.content.toLowerCase().includes(searchTerm) ||
+      (NOTE_SUBJECT_NAMES[n.subject]||'').toLowerCase().includes(searchTerm)
+    );
+    document.getElementById('notes-result-count').style.display = 'block';
+    document.getElementById('notes-result-count').textContent = `${notes.length} note${notes.length!==1?'s':''} found`;
+    document.getElementById('notes-list-label').textContent = 'Search Results';
+  } else {
+    // Show only current subject
+    notes = notes.filter(n=>n.subject===currentNoteSubject);
+    document.getElementById('notes-result-count').style.display = 'none';
+    document.getElementById('notes-list-label').textContent = NOTE_SUBJECT_NAMES[currentNoteSubject] + ' — Notes';
+  }
+
+  badge.textContent = notes.length ? `${notes.length} note${notes.length!==1?'s':''}` : '';
+
+  if(!notes.length) {
+    list.innerHTML = `<div class="card" style="text-align:center;padding:2rem;color:var(--text-3);">
+      <div style="font-size:28px;margin-bottom:8px;">📓</div>
+      <div style="font-weight:500;margin-bottom:4px;">${isSearchMode?'No notes match your search':'No notes yet for this subject'}</div>
+      <div style="font-size:13px;">${isSearchMode?'Try different search terms':'Click "+ Add Note" above to get started'}</div>
+    </div>`;
+    return;
+  }
+
+  list.innerHTML = notes.map(n => {
+    const ac = AUTHOR_COLORS[n.author]||{bg:'#F1EFE8',color:'#444'};
+    const subName = NOTE_SUBJECT_NAMES[n.subject]||n.subject;
+    const displayDate = new Date(n.date+'T12:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+    const bodyHtml = searchTerm ? highlightText(n.content, searchTerm) : n.content;
+    return `<div class="note-card" id="nc-${n.id}">
+      <div class="note-card-header">
+        <div class="note-card-meta">
+          <span class="note-card-date">${displayDate}</span>
+          <span class="note-author-tag" style="background:${ac.bg};color:${ac.color};">${n.author}</span>
+          ${isSearchMode?`<span style="font-size:11px;padding:2px 8px;border-radius:99px;background:var(--bg);color:var(--text-2);border:1px solid var(--border);">${subName}</span>`:''}
+        </div>
+        <button class="del-btn" onclick="deleteClassNote('${n.id}')" title="Delete note">×</button>
+      </div>
+      <div class="note-card-body">${bodyHtml}</div>
+    </div>`;
+  }).join('');
+}
+
+window.filterNotes = function() { renderNotesList(); };
+
+// =================== END CLASS NOTES ===================
+
+window.showSyl = function(id) {
+  document.querySelectorAll('.syl-panel').forEach(p=>p.style.display='none');
+  document.querySelectorAll('.syl-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('syl-'+id).style.display='block';
+  event.target.classList.add('active');
+  const noteEl = document.querySelector('#syl-'+id+' textarea.note');
+  if(noteEl && state.sylNotes && state.sylNotes[id]) noteEl.value = state.sylNotes[id];
+  if(id==='commservices') renderYMSLLog();
+};
+
+window.saveSylNote = function(id, val) {
+  if(!state.sylNotes) state.sylNotes = {};
+  state.sylNotes[id] = val;
+  saveState();
+};
+
+const YMSL_MONTHS = ['May','June','July','August','September','October','November','December','January','February','March','April'];
+
+function renderYMSLLog() {
+  const el = document.getElementById('ymsl-log');
+  if(!el) return;
+  if(!state.ymsl) state.ymsl = {};
+  let totalHours = 0;
+  let html = `<div style="overflow-x:auto;">
+    <table style="width:100%;border-collapse:collapse;font-size:13px;">
+      <thead>
+        <tr style="background:var(--bg);">
+          <th style="padding:8px 10px;text-align:left;border-bottom:2px solid var(--border);width:90px;">Month</th>
+          <th style="padding:8px 10px;text-align:left;border-bottom:2px solid var(--border);">Organization(s) Served</th>
+          <th style="padding:8px 10px;text-align:center;border-bottom:2px solid var(--border);width:70px;">Hours</th>
+          <th style="padding:8px 10px;text-align:center;border-bottom:2px solid var(--border);width:80px;">Report</th>
+        </tr>
+      </thead>
+      <tbody>`;
+  YMSL_MONTHS.forEach(m => {
+    const row = (state.ymsl[m] || {});
+    const hrs = parseFloat(row.hours||0);
+    totalHours += hrs;
+    html += `<tr style="border-bottom:1px solid var(--border);">
+      <td style="padding:8px 10px;font-weight:500;color:var(--text-2);">${m}</td>
+      <td style="padding:6px 10px;">
+        <input value="${row.orgs||''}" placeholder="Enter organizations…"
+          style="width:100%;font-size:13px;padding:4px 8px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);font-family:inherit;"
+          onchange="saveYMSL('${m}','orgs',this.value)">
+      </td>
+      <td style="padding:6px 10px;text-align:center;">
+        <input type="number" value="${row.hours||''}" placeholder="0" min="0" max="40"
+          style="width:55px;font-size:13px;padding:4px 6px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);text-align:center;font-family:inherit;"
+          onchange="saveYMSL('${m}','hours',this.value)">
+      </td>
+      <td style="padding:6px 10px;text-align:center;">
+        <input type="checkbox" ${row.report?'checked':''} onchange="saveYMSL('${m}','report',this.checked)"
+          style="width:18px;height:18px;cursor:pointer;accent-color:var(--blue);">
+      </td>
+    </tr>`;
+  });
+  html += `</tbody>
+      <tfoot>
+        <tr style="background:var(--bg);">
+          <td colspan="2" style="padding:10px;font-weight:600;">Total</td>
+          <td style="padding:10px;text-align:center;font-weight:700;color:var(--blue);">${totalHours}</td>
+          <td style="padding:10px;text-align:center;font-size:12px;color:var(--text-3);">
+            ${Object.values(state.ymsl||{}).filter(r=>r.report).length}/12
+          </td>
+        </tr>
+      </tfoot>
+    </table></div>`;
+  el.innerHTML = html;
+}
+
+window.saveYMSL = function(month, field, val) {
+  if(!state.ymsl) state.ymsl = {};
+  if(!state.ymsl[month]) state.ymsl[month] = {};
+  state.ymsl[month][field] = val;
+  renderYMSLLog();
+  saveState();
 };
 
 // --- TIMER SUB-TABS ---
