@@ -616,9 +616,33 @@ select { font-size: 13px; padding: 7px 8px; border: 1px solid var(--border); bor
       <div id="trk-studyhr" class="trk-panel" style="display:none;">
         <div class="syl-header" style="background:#E0F5EC;border-color:#80C8A0;">
           <div class="syl-course-title" style="color:#2D6B4F;">Study / Reading</div>
-          <div class="syl-meta">Activity tracker</div>
+          <div class="syl-meta">Reading log</div>
         </div>
-        <div class="syl-body"><div class="syl-placeholder"><div style="font-size:32px;margin-bottom:12px;">📊</div><div style="font-weight:600;margin-bottom:6px;">Tracker not yet configured</div><div style="font-size:13px;color:var(--text-3);">Let us know what to track here and we'll build it.</div></div></div>
+        <div class="syl-body">
+          <div class="stat-grid" id="rd-stats" style="margin-bottom:1.25rem;"></div>
+
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+            <div class="section-label" style="margin-bottom:0;">Reading Log</div>
+            <button onclick="addRDRow()" class="btn-sm primary" style="font-size:12px;padding:5px 12px;">+ Add Row</button>
+          </div>
+
+          <div class="pe-table-wrap">
+            <table class="pe-table">
+              <thead>
+                <tr>
+                  <th style="width:130px;">Date</th>
+                  <th>Title / Chapters or Pages</th>
+                  <th style="width:110px;">Total Pages</th>
+                  <th style="width:36px;"></th>
+                </tr>
+              </thead>
+              <tbody id="rd-table-body"></tbody>
+            </table>
+          </div>
+
+          <div class="section-label" style="margin-top:1.5rem;">Weekly Breakdown</div>
+          <div id="rd-weekly-breakdown"></div>
+        </div>
       </div>
 
       <div id="trk-socialskills" class="trk-panel" style="display:none;">
@@ -1128,16 +1152,28 @@ select { font-size: 13px; padding: 7px 8px; border: 1px solid var(--border); bor
       <div class="section-label">Add a custom date</div>
       <div class="card" style="margin-bottom:1.25rem;">
         <div class="ev-form">
-          <input id="ev-title" placeholder="Event name…">
-          <input id="ev-date" type="date">
-          <input id="ev-date-end" type="date" placeholder="End date (optional)">
-          <select id="ev-type">
-            <option value="custom">Custom</option>
-            <option value="holiday">Holiday / no school</option>
-            <option value="test">Test / assessment</option>
-            <option value="deadline">Deadline</option>
-            <option value="milestone">Milestone</option>
-          </select>
+          <div>
+            <div class="section-label" style="margin-bottom:4px;">Event Name</div>
+            <input id="ev-title" placeholder="Event name…" style="width:100%;">
+          </div>
+          <div>
+            <div class="section-label" style="margin-bottom:4px;">Type</div>
+            <select id="ev-type" style="width:100%;">
+              <option value="custom">Custom</option>
+              <option value="holiday">Holiday / no school</option>
+              <option value="test">Test / assessment</option>
+              <option value="deadline">Deadline</option>
+              <option value="milestone">Milestone</option>
+            </select>
+          </div>
+          <div>
+            <div class="section-label" style="margin-bottom:4px;">Start Date</div>
+            <input id="ev-date" type="date" style="width:100%;">
+          </div>
+          <div>
+            <div class="section-label" style="margin-bottom:4px;">End Date <span style="text-transform:none;font-weight:400;">(optional)</span></div>
+            <input id="ev-date-end" type="date" style="width:100%;">
+          </div>
         </div>
         <button class="btn-sm primary" onclick="addEvent()" style="width:100%;">Add date</button>
       </div>
@@ -1720,6 +1756,7 @@ window.showTrk = function(id) {
   event.target.classList.add('active');
   if(id==='commservices') renderCSTracker();
   if(id==='pe') renderPETracker();
+  if(id==='studyhr') renderRDTracker();
 };
 
 // =================== COMM SERVICES TRACKER ===================
@@ -2070,6 +2107,92 @@ function renderPEStatsAndWeekly() {
   }).join('');
 }
 // =================== END PE TRACKER ===================
+
+// =================== READING LOG TRACKER ===================
+window.addRDRow = function() {
+  if(!state.rdLog) state.rdLog = [];
+  state.rdLog.unshift({
+    id: Date.now()+'',
+    date: new Date().toISOString().split('T')[0],
+    title: '',
+    pages: ''
+  });
+  renderRDTracker();
+  saveState();
+};
+
+window.updateRDRow = function(id, field, value) {
+  const row = (state.rdLog||[]).find(r=>r.id===id);
+  if(!row) return;
+  row[field] = value;
+  renderRDStatsAndWeekly();
+  saveState();
+};
+
+window.deleteRDRow = function(id) {
+  state.rdLog = (state.rdLog||[]).filter(r=>r.id!==id);
+  renderRDTracker();
+  saveState();
+};
+
+function renderRDTracker() {
+  if(!state.rdLog) state.rdLog = [];
+  const tbody = document.getElementById('rd-table-body');
+
+  if(!state.rdLog.length) {
+    tbody.innerHTML = `<tr><td colspan="4" style="padding:2rem;text-align:center;color:var(--text-3);">
+      No reading logged yet. Click "+ Add Row" to start tracking.
+    </td></tr>`;
+  } else {
+    tbody.innerHTML = state.rdLog.map(row => `
+      <tr id="rd-row-${row.id}">
+        <td><input type="date" class="pe-cell-input" value="${row.date||''}" onchange="updateRDRow('${row.id}','date',this.value)"></td>
+        <td><input type="text" class="pe-cell-input" placeholder="e.g. Hatchet, Ch. 3-5 or pp. 40-62" value="${row.title||''}" onchange="updateRDRow('${row.id}','title',this.value)"></td>
+        <td><input type="number" min="0" max="999" step="1" class="pe-cell-input pe-hrs-input" placeholder="0" value="${row.pages||''}" onchange="updateRDRow('${row.id}','pages',this.value)"></td>
+        <td class="pe-del-cell"><button class="del-btn" onclick="deleteRDRow('${row.id}')" title="Delete row">×</button></td>
+      </tr>`).join('');
+  }
+  renderRDStatsAndWeekly();
+}
+
+function renderRDStatsAndWeekly() {
+  const log = state.rdLog || [];
+  const totalPages = log.reduce((sum,r)=>sum+(parseFloat(r.pages)||0),0);
+
+  document.getElementById('rd-stats').innerHTML = `
+    <div class="stat-card"><div class="stat-num">${totalPages}</div><div class="stat-lbl">Total pages read</div></div>
+    <div class="stat-card"><div class="stat-num">${log.length}</div><div class="stat-lbl">Entries logged</div></div>
+    <div class="stat-card"><div class="stat-num">${log.length ? Math.round(totalPages/log.length) : 0}</div><div class="stat-lbl">Avg pages/entry</div></div>
+  `;
+
+  const weekMap = {};
+  log.forEach(r => {
+    if(!r.date) return;
+    const wk = getWeekStart(r.date);
+    if(!weekMap[wk]) weekMap[wk] = 0;
+    weekMap[wk] += (parseFloat(r.pages)||0);
+  });
+
+  const weekKeys = Object.keys(weekMap).sort().reverse();
+  const breakdown = document.getElementById('rd-weekly-breakdown');
+  if(!weekKeys.length) {
+    breakdown.innerHTML = `<div class="card" style="text-align:center;padding:1.5rem;color:var(--text-3);font-size:13px;">No weekly data yet</div>`;
+    return;
+  }
+  breakdown.innerHTML = weekKeys.map(wk => {
+    const start = new Date(wk+'T12:00:00');
+    const end = new Date(start); end.setDate(end.getDate()+6);
+    const endStr = end.toISOString().split('T')[0];
+    return `<div class="pe-week-row">
+      <div>
+        <div class="pe-week-label">Week of ${fmtShortDate(wk)}</div>
+        <div class="pe-week-dates">${fmtShortDate(wk)} – ${fmtShortDate(endStr)}</div>
+      </div>
+      <div class="pe-week-hrs" style="color:#1A5C3F;">${weekMap[wk]} pages</div>
+    </div>`;
+  }).join('');
+}
+// =================== END READING LOG TRACKER ===================
 
 window.showSyl = function(id) {
   document.querySelectorAll('.syl-panel').forEach(p=>p.style.display='none');
