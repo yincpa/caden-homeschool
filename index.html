@@ -244,6 +244,31 @@ select { font-size: 13px; padding: 7px 8px; border: 1px solid var(--border); bor
 .syl-unit-title { font-size:13px; font-weight:600; color:var(--text); margin-bottom:4px; }
 .syl-unit p { font-size:13px; color:var(--text-2); line-height:1.5; margin:0; }
 .syl-placeholder { text-align:center; padding:3rem 1rem; color:var(--text-2); }
+.agr-row { display:flex; align-items:flex-start; gap:12px; padding:14px 16px; border-bottom:1px solid var(--border); }
+.agr-row:last-child { border-bottom:none; }
+.agr-row:hover { background:var(--bg); }
+.agr-number { font-size:18px; font-weight:700; color:var(--blue); min-width:28px; padding-top:1px; font-family:'DM Mono',monospace; }
+.agr-body { flex:1; }
+.agr-text { font-size:14px; color:var(--text); line-height:1.6; margin-bottom:5px; }
+.agr-cat-tag { font-size:11px; padding:2px 9px; border-radius:99px; font-weight:600; display:inline-block; }
+.agr-actions { display:flex; align-items:center; gap:4px; flex-shrink:0; padding-top:2px; }
+.agr-move-btn { background:none; border:1px solid var(--border); border-radius:4px; cursor:pointer; color:var(--text-2); font-size:12px; padding:3px 6px; line-height:1; }
+.agr-move-btn:hover:not([disabled]) { background:var(--bg); color:var(--text); }
+.agr-move-btn[disabled] { opacity:0.3; cursor:default; }
+.agr-edit-btn { background:none; border:none; cursor:pointer; font-size:14px; padding:3px 4px; }
+.agr-edit-btn:hover { opacity:0.7; }
+ align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid var(--border); }
+.alarm-row:last-child { border-bottom:none; }
+.alarm-time-display { font-size:18px; font-weight:600; font-family:'DM Mono',monospace; color:var(--text); min-width:75px; }
+.alarm-info { flex:1; }
+.alarm-label-text { font-size:13px; font-weight:500; color:var(--text); }
+.alarm-repeat-text { font-size:11px; color:var(--text-3); margin-top:1px; }
+.alarm-toggle { position:relative; width:40px; height:22px; flex-shrink:0; }
+.alarm-toggle input { opacity:0; width:0; height:0; }
+.alarm-slider { position:absolute; inset:0; background:var(--border-strong); border-radius:99px; cursor:pointer; transition:0.2s; }
+.alarm-slider::before { content:''; position:absolute; width:16px; height:16px; left:3px; top:3px; background:white; border-radius:50%; transition:0.2s; box-shadow:0 1px 3px rgba(0,0,0,0.2); }
+.alarm-toggle input:checked + .alarm-slider { background:var(--blue); }
+.alarm-toggle input:checked + .alarm-slider::before { transform:translateX(18px); }
 @media (max-width: 600px) { .syl-two-col { grid-template-columns:1fr; } }
 
   .main { padding: 1rem; }
@@ -288,6 +313,7 @@ select { font-size: 13px; padding: 7px 8px; border: 1px solid var(--border); bor
     <button class="nav-btn" onclick="switchTab('syllabus')">📋 Syllabus</button>
     <button class="nav-btn" onclick="switchTab('timer')">⏱ Timers</button>
     <button class="nav-btn" onclick="switchTab('calendar')">🗓 Dates</button>
+    <button class="nav-btn" onclick="switchTab('agreements')">🤝 Agreements</button>
     <button class="nav-btn" onclick="switchTab('help')">🙋 Help</button>
   </nav>
 
@@ -300,26 +326,54 @@ select { font-size: 13px; padding: 7px 8px; border: 1px solid var(--border); bor
       <div class="section-label">Subjects</div>
       <div id="subjects-list"></div>
 
-      <!-- TO-DO SECTION (merged into Courses) -->
+      <!-- UNIFIED TASK ENTRY -->
       <div style="margin-top:1.5rem;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-          <div class="section-label" style="margin-bottom:0;">General To-Dos</div>
+          <div class="section-label" style="margin-bottom:0;">Tasks &amp; To-Dos</div>
           <button onclick="toggleTodoForm()" id="todo-add-btn" class="btn-sm primary" style="font-size:12px;padding:5px 12px;">+ Add Task</button>
         </div>
+
         <div id="todo-form-wrap" style="display:none;margin-bottom:12px;">
           <div class="card">
-            <div class="todo-form">
-              <input id="todo-input" placeholder="New task…" onkeydown="if(event.key==='Enter')addTodo()">
-              <select id="todo-subject"></select>
-              <button class="btn-sm primary" onclick="addTodo()">Add</button>
+            <!-- Row 1: Description -->
+            <div style="margin-bottom:10px;">
+              <div class="section-label" style="margin-bottom:4px;">Task Description</div>
+              <input id="todo-input" placeholder="What needs to be done?" onkeydown="if(event.key==='Enter')addTodo()"
+                style="width:100%;font-size:14px;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);font-family:inherit;">
             </div>
-            <div style="display:flex;align-items:center;gap:8px;margin-top:8px;">
-              <span style="font-size:12px;color:var(--text-2);">Priority:</span>
-              <select id="todo-priority"><option value="normal">Normal</option><option value="high">High</option><option value="low">Low</option></select>
-              <button class="btn-sm" onclick="toggleTodoForm()" style="margin-left:auto;font-size:12px;">Cancel</button>
+            <!-- Row 2: Category + Priority + Due Date -->
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px;">
+              <div>
+                <div class="section-label" style="margin-bottom:4px;">Subject</div>
+                <select id="todo-subject" style="width:100%;font-size:13px;padding:0 8px;height:36px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);font-family:inherit;"></select>
+              </div>
+              <div>
+                <div class="section-label" style="margin-bottom:4px;">Priority</div>
+                <select id="todo-priority" style="width:100%;font-size:13px;padding:0 8px;height:36px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);font-family:inherit;">
+                  <option value="normal">Normal</option>
+                  <option value="high">High</option>
+                  <option value="low">Low</option>
+                </select>
+              </div>
+              <div>
+                <div class="section-label" style="margin-bottom:4px;">Due Date <span style="text-transform:none;font-weight:400;">(optional)</span></div>
+                <input type="date" id="todo-duedate" style="width:100%;font-size:13px;padding:0 8px;height:36px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);font-family:inherit;">
+              </div>
+            </div>
+            <!-- Row 3: Notes -->
+            <div style="margin-bottom:12px;">
+              <div class="section-label" style="margin-bottom:4px;">Notes <span style="text-transform:none;font-weight:400;">(optional)</span></div>
+              <textarea id="todo-notes" placeholder="Any additional notes or context…"
+                style="width:100%;min-height:60px;font-size:13px;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);font-family:inherit;resize:vertical;"></textarea>
+            </div>
+            <!-- Row 4: Buttons -->
+            <div style="display:flex;gap:8px;">
+              <button class="btn-sm primary" onclick="addTodo()" style="flex:1;">Save Task</button>
+              <button class="btn-sm" onclick="toggleTodoForm()">Cancel</button>
             </div>
           </div>
         </div>
+
         <div class="section-label" style="font-size:10px;margin-bottom:6px;">Open</div>
         <div class="card" id="todo-open"></div>
         <div class="section-label" style="font-size:10px;margin-top:1rem;margin-bottom:6px;">Completed</div>
@@ -1089,14 +1143,72 @@ select { font-size: 13px; padding: 7px 8px; border: 1px solid var(--border); bor
         <div style="display:flex;justify-content:center;margin-bottom:2rem;">
           <canvas id="analog-clock" width="280" height="280"></canvas>
         </div>
-        <div style="text-align:center;">
+        <div style="text-align:center;margin-bottom:1.5rem;">
           <div id="clock-digital" style="font-size:32px;font-weight:600;font-family:'DM Mono',monospace;color:var(--text);letter-spacing:0.05em;"></div>
           <div id="clock-ampm" style="font-size:14px;color:var(--text-3);margin-top:2px;"></div>
+        </div>
+
+        <!-- ALARM SECTION -->
+        <div class="section-label">Alarms</div>
+        <div class="card" style="margin-bottom:1rem;">
+          <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end;margin-bottom:10px;">
+            <div>
+              <div class="section-label" style="margin-bottom:4px;">Time</div>
+              <input type="time" id="alarm-time-input"
+                style="width:100%;font-size:14px;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);font-family:inherit;">
+            </div>
+            <div>
+              <div class="section-label" style="margin-bottom:4px;">Label</div>
+              <input type="text" id="alarm-label-input" placeholder="e.g. World History"
+                style="width:100%;font-size:13px;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);font-family:inherit;">
+            </div>
+            <div>
+              <div class="section-label" style="margin-bottom:4px;">Repeat</div>
+              <select id="alarm-repeat-input"
+                style="width:100%;font-size:13px;padding:7px 8px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);font-family:inherit;">
+                <option value="once">Once</option>
+                <option value="daily">Daily</option>
+                <option value="weekdays">Weekdays</option>
+                <option value="weekends">Weekends</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn-sm primary" onclick="addAlarm()" style="width:100%;">+ Add Alarm</button>
+        </div>
+
+        <div id="alarm-list"></div>
+
+        <!-- ALARM RINGING BANNER -->
+        <div id="alarm-banner" style="display:none;position:fixed;top:60px;left:50%;transform:translateX(-50%);z-index:999;background:#185FA5;color:white;padding:14px 24px;border-radius:var(--radius);box-shadow:var(--shadow-md);text-align:center;min-width:260px;">
+          <div style="font-size:22px;margin-bottom:4px;">⏰</div>
+          <div id="alarm-banner-label" style="font-size:16px;font-weight:600;"></div>
+          <div style="font-size:13px;opacity:0.85;margin-bottom:10px;" id="alarm-banner-time"></div>
+          <button onclick="dismissAlarm()" style="background:white;color:#185FA5;border:none;border-radius:99px;padding:6px 20px;font-weight:600;cursor:pointer;font-family:inherit;">Dismiss</button>
         </div>
       </div>
 
       <!-- POMODORO SUB-TAB -->
       <div id="tsub-pomodoro-panel" style="display:none;">
+        <div style="display:flex;justify-content:center;gap:16px;margin-bottom:1rem;">
+          <div style="text-align:center;">
+            <div class="section-label" style="margin-bottom:4px;">Focus mins</div>
+            <input type="number" id="pom-focus-mins" value="25" min="1" max="60"
+              style="width:64px;font-size:15px;padding:6px 8px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);font-family:'DM Mono',monospace;text-align:center;color:var(--text);"
+              onchange="resetTimer()">
+          </div>
+          <div style="text-align:center;">
+            <div class="section-label" style="margin-bottom:4px;">Break mins</div>
+            <input type="number" id="pom-break-mins" value="5" min="1" max="30"
+              style="width:64px;font-size:15px;padding:6px 8px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);font-family:'DM Mono',monospace;text-align:center;color:var(--text);"
+              onchange="resetTimer()">
+          </div>
+          <div style="text-align:center;">
+            <div class="section-label" style="margin-bottom:4px;">Rounds</div>
+            <input type="number" id="pom-rounds" value="4" min="1" max="8"
+              style="width:64px;font-size:15px;padding:6px 8px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);font-family:'DM Mono',monospace;text-align:center;color:var(--text);"
+              onchange="resetTimer()">
+          </div>
+        </div>
         <div class="timer-face">
           <div class="timer-digits" id="timer-digits">25:00</div>
           <div class="timer-sublabel" id="timer-sublabel">Focus session</div>
@@ -1180,6 +1292,64 @@ select { font-size: 13px; padding: 7px 8px; border: 1px solid var(--border); bor
       <div id="calendar-list"></div>
     </div>
 
+    <!-- AGREEMENTS TAB -->
+    <div id="tab-agreements" class="tab">
+
+      <!-- Header -->
+      <div style="text-align:center;padding:1.5rem 0 1rem;">
+        <div style="font-size:36px;margin-bottom:8px;">🤝</div>
+        <div style="font-size:20px;font-weight:700;color:var(--text);margin-bottom:4px;">Our Homeschool Agreements</div>
+        <div style="font-size:13px;color:var(--text-2);max-width:420px;margin:0 auto;">These are the commitments Caden, Mom, and Dad have agreed to together for a successful homeschool year.</div>
+      </div>
+
+      <!-- Add / Edit form -->
+      <div class="card" style="margin-bottom:1.5rem;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+          <div class="section-label" style="margin-bottom:0;" id="agr-form-title">Add an Agreement</div>
+          <button onclick="toggleAgrForm()" id="agr-toggle-btn" class="btn-sm primary" style="font-size:12px;padding:5px 12px;">+ Add</button>
+        </div>
+        <div id="agr-form-wrap" style="display:none;margin-top:12px;border-top:1px solid var(--border);padding-top:12px;">
+          <div style="margin-bottom:8px;">
+            <div class="section-label" style="margin-bottom:4px;">Agreement</div>
+            <textarea id="agr-text-input" placeholder="e.g. I will start each school day by 9am and be ready to learn."
+              style="width:100%;min-height:72px;font-size:14px;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);font-family:inherit;resize:vertical;"></textarea>
+          </div>
+          <div style="margin-bottom:10px;">
+            <div class="section-label" style="margin-bottom:4px;">Category <span style="text-transform:none;font-weight:400;color:var(--text-3);">(optional)</span></div>
+            <input id="agr-category-input" placeholder="e.g. Attendance, Respect, Academics, Technology…"
+              style="width:100%;font-size:13px;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);font-family:inherit;">
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn-sm primary" onclick="saveAgreement()" style="flex:1;" id="agr-save-btn">Save Agreement</button>
+            <button class="btn-sm" onclick="cancelAgrEdit()">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Agreement list -->
+      <div id="agr-list"></div>
+
+      <!-- Signed footer -->
+      <div class="card" style="margin-top:1.5rem;text-align:center;background:var(--bg);">
+        <div style="font-size:13px;color:var(--text-3);margin-bottom:8px;">These agreements were made together and signed in spirit by:</div>
+        <div style="display:flex;justify-content:center;gap:32px;">
+          <div style="text-align:center;">
+            <div style="font-size:22px;">👦</div>
+            <div style="font-size:13px;font-weight:600;color:var(--text);margin-top:4px;">Caden</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:22px;">👩</div>
+            <div style="font-size:13px;font-weight:600;color:var(--text);margin-top:4px;">Pam</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:22px;">👨</div>
+            <div style="font-size:13px;font-weight:600;color:var(--text);margin-top:4px;">Dad</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
     <!-- HELP TAB (Caden's view) -->
     <div id="tab-help" class="tab">
       <div class="card" style="text-align:center;padding:2rem;">
@@ -1239,6 +1409,7 @@ const SUBJECTS = [
   {id:'momtutorial',  name:'Mom Tutorial',          color:'#6B2D8B', bg:'#F3E8FF', category:'noncredit', sessions:[{day:'Fri',time:'9am',cr:0},{day:'Wed',time:'1pm',cr:0}]},
   {id:'studyhr',      name:'Study/Reading',         color:'#2D6B4F', bg:'#E0F5EC', category:'noncredit', sessions:[{day:'Mon',time:'10am',cr:0},{day:'Tue',time:'10am',cr:0},{day:'Thu',time:'10am',cr:0},{day:'Fri',time:'10am',cr:0}]},
   {id:'socialskills', name:'Social Skills',         color:'#8B5E0C', bg:'#FFF3DC', category:'noncredit', sessions:[{day:'Mon',time:'1pm',cr:0}]},
+  {id:'',             name:'General',               color:'#888780', bg:'#F1EFE8', category:'noncredit', sessions:[]},
 ];
 
 const DAYS = ['Mon','Tue','Wed','Thu','Fri'];
@@ -1327,18 +1498,29 @@ onSnapshot(STATE_DOC, (snap) => {
 function renderAll() {
   renderStats(); renderSubjects(); renderSchedule(); renderCredits();
   renderTodos(); populateDropdowns(); renderTimerLog(); renderCalendar(); renderHelpState();
+  renderAlarms(); renderAgreements();
 }
 
 function renderStats() {
-  let total=0, done=0;
-  SUBJECTS.forEach(s => { const l=state.assignments[s.id]||[]; total+=l.length; done+=l.filter(a=>a.done).length; });
+  const todos = state.todos||[];
+  const total = todos.length;
+  const done = todos.filter(t=>t.done).length;
   const pct = total ? Math.round(done/total*100) : 0;
-  const open = (state.todos||[]).filter(t=>!t.done).length;
+  const open = todos.filter(t=>!t.done).length;
   document.getElementById('stat-grid').innerHTML = `
     <div class="stat-card"><div class="stat-num">${done}/${total}</div><div class="stat-lbl">Tasks done</div></div>
     <div class="stat-card"><div class="stat-num">${pct}%</div><div class="stat-lbl">Progress</div></div>
-    <div class="stat-card"><div class="stat-num">${open}</div><div class="stat-lbl">Open to-dos</div></div>`;
+    <div class="stat-card"><div class="stat-num">${open}</div><div class="stat-lbl">Open tasks</div></div>`;
 }
+
+window.toggleDoneSection = function(sid) {
+  const sec = document.getElementById('done-section-'+sid);
+  const chev = document.getElementById('done-chev-'+sid);
+  if(!sec) return;
+  const isOpen = sec.style.display !== 'none';
+  sec.style.display = isOpen ? 'none' : 'block';
+  chev.style.transform = isOpen ? '' : 'rotate(90deg)';
+};
 
 const CATEGORIES = [
   { id:'core',      label:'Core Classes',        color:'#0C447C', bg:'#D6E8F7', border:'#A8CCE8', desc:'Credited academic courses' },
@@ -1347,53 +1529,74 @@ const CATEGORIES = [
 ];
 
 function subjectCardHTML(s) {
-  const list = state.assignments[s.id]||[];
-  const done = list.filter(a=>a.done).length;
-  const pct = list.length ? Math.round(done/list.length*100) : 0;
+  const sid = s.id || 'general'; // use 'general' as DOM id for empty-string subject
+  const todos = (state.todos||[]).filter(t=>t.subject===(s.id));
+  const open = todos.filter(t=>!t.done);
+  const done = todos.filter(t=>t.done);
   const totalCr = semCr(s);
   const crLabel = totalCr > 0 ? `${totalCr} cr` : '0 cr';
   const crStyle = totalCr > 0
     ? 'background:var(--blue-light);color:var(--blue-dark);'
     : 'background:var(--gray-light);color:var(--gray);';
+  const pct = todos.length ? Math.round(done.length/todos.length*100) : 0;
+  const priC = {high:'#A32D2D',normal:'#0C447C',low:'#5F5E5A'};
+  const priB = {high:'#FCEBEB',normal:'#E6F1FB',low:'#F1EFE8'};
+
+  function taskRow(t) {
+    const dueLine = t.duedate ? `<span style="font-size:11px;color:var(--text-3);">📅 ${new Date(t.duedate+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'})}</span>` : '';
+    const noteLine = t.notes ? `<span style="font-size:11px;color:var(--text-3);">📝 ${t.notes}</span>` : '';
+    return `<div class="assignment-row" style="flex-wrap:wrap;">
+      <div style="display:flex;align-items:center;gap:10px;width:100%;">
+        <div class="checkbox ${t.done?'done':''}" onclick="toggleTodo('${t.id}')"></div>
+        <span class="a-name ${t.done?'done':''}" style="flex:1;">${t.name}</span>
+        <span class="tag" style="background:${priB[t.priority||'normal']};color:${priC[t.priority||'normal']};font-size:10px;">${t.priority||'normal'}</span>
+        <button class="del-btn" onclick="delTodo('${t.id}')">×</button>
+      </div>
+      ${(t.duedate||t.notes)?`<div style="padding-left:28px;display:flex;gap:8px;flex-wrap:wrap;">${dueLine}${noteLine}</div>`:''}
+    </div>`;
+  }
+
   return `<div class="subject-card">
-    <div class="subject-header" onclick="toggleSub('${s.id}')">
+    <div class="subject-header" onclick="toggleSub('${sid}')">
       <div class="subject-left">
         <span class="subject-dot" style="background:${s.color}"></span>
         <span class="subject-name">${s.name}</span>
         <span class="cr-badge" style="${crStyle}">${crLabel}</span>
       </div>
       <div class="subject-right">
-        <span class="subject-count">${done}/${list.length}</span>
-        <span class="chevron" id="chev-${s.id}">›</span>
+        <span class="subject-count">${done.length}/${todos.length}</span>
+        <span class="chevron" id="chev-${sid}">›</span>
       </div>
     </div>
     <div class="prog-bar"><div class="prog-fill" style="width:${pct}%;background:${s.color}"></div></div>
-    <div class="subject-body" id="body-${s.id}">
+    <div class="subject-body" id="body-${sid}">
       <div style="padding-top:10px;">
-      ${list.map((a,i) => `
-        <div class="assignment-row">
-          <div class="checkbox ${a.done?'done':''}" onclick="toggleA('${s.id}',${i})"></div>
-          <span class="a-name ${a.done?'done':''}">${a.name}</span>
-          <button class="del-btn" onclick="delA('${s.id}',${i})">×</button>
-        </div>`).join('')}
-      <div class="add-row" style="margin-top:${list.length?'10px':'0'}">
-        <input id="ai-${s.id}" placeholder="Add assignment…" onkeydown="if(event.key==='Enter')addA('${s.id}')">
-        <button class="btn-sm" onclick="addA('${s.id}')">Add</button>
-      </div>
-      <div style="margin-top:10px;"><div class="section-label" style="margin-bottom:4px;">Notes</div>
-        <textarea class="note" placeholder="Notes, resources, goals…" onchange="saveNote('${s.id}',this.value)">${state.assignments[s.id+'_note']||''}</textarea>
-      </div>
+        ${open.length ? open.map(taskRow).join('') : '<div style="font-size:13px;color:var(--text-3);padding:6px 0;">No open tasks</div>'}
+        ${done.length ? `
+          <div onclick="toggleDoneSection('${sid}')" style="display:flex;align-items:center;gap:6px;cursor:pointer;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">
+            <span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-3);">Completed (${done.length})</span>
+            <span id="done-chev-${sid}" style="font-size:13px;color:var(--text-3);">›</span>
+          </div>
+          <div id="done-section-${sid}" style="display:none;">
+            ${done.map(taskRow).join('')}
+          </div>` : ''}
+        ${s.id !== '' ? `<div style="margin-top:10px;border-top:1px solid var(--border);padding-top:10px;">
+          <div class="section-label" style="margin-bottom:4px;">Comments</div>
+          <textarea class="note" placeholder="Notes, resources, goals…" onchange="saveNote('${s.id}',this.value)">${state.assignments[s.id+'_note']||''}</textarea>
+        </div>` : ''}
       </div>
     </div>
   </div>`;
 }
 
 function renderSubjects() {
+  const openIds = getOpenSubjects(); // save which panels are open before re-render
   const c = document.getElementById('subjects-list'); c.innerHTML = '';
   CATEGORIES.forEach(cat => {
     const catSubs = SUBJECTS.filter(s => s.category === cat.id);
-    const catTotal = catSubs.reduce((sum,s) => sum + (state.assignments[s.id]||[]).length, 0);
-    const catDone  = catSubs.reduce((sum,s) => sum + (state.assignments[s.id]||[]).filter(a=>a.done).length, 0);
+    const catTodos = (state.todos||[]).filter(t => catSubs.some(s=>s.id===t.subject));
+    const catDone  = catTodos.filter(t=>t.done).length;
+    const catTotal = catTodos.length;
     const totalCr  = catSubs.reduce((sum,s) => sum + semCr(s), 0);
 
     // Category header
@@ -1420,6 +1623,7 @@ function renderSubjects() {
     container.innerHTML = catSubs.map(s => subjectCardHTML(s)).join('');
     c.appendChild(container);
   });
+  restoreOpenSubjects(openIds); // restore previously open panels
 }
 
 window.toggleCat = function(id) {
@@ -1436,6 +1640,22 @@ window.toggleSub = function(id) {
   const open = b.classList.toggle('open');
   ch.style.transform = open ? 'rotate(90deg)' : '';
 };
+
+function getOpenSubjects() {
+  return SUBJECTS.map(s => s.id||'general').filter(sid => {
+    const b = document.getElementById('body-'+sid);
+    return b && b.classList.contains('open');
+  });
+}
+
+function restoreOpenSubjects(openIds) {
+  openIds.forEach(sid => {
+    const b = document.getElementById('body-'+sid);
+    const ch = document.getElementById('chev-'+sid);
+    if(b) b.classList.add('open');
+    if(ch) ch.style.transform = 'rotate(90deg)';
+  });
+}
 window.addA = function(sid) {
   const inp = document.getElementById('ai-'+sid); const v = inp.value.trim(); if(!v) return;
   if(!state.assignments[sid]) state.assignments[sid]=[];
@@ -1516,17 +1736,35 @@ function renderTodos() {
   const todos = state.todos||[];
   const priC = {high:'#A32D2D',normal:'#0C447C',low:'#5F5E5A'};
   const priB = {high:'#FCEBEB',normal:'#E6F1FB',low:'#F1EFE8'};
+
+  function fmtDue(d) {
+    if(!d) return '';
+    const dt = new Date(d+'T12:00:00');
+    const today = new Date(); today.setHours(0,0,0,0);
+    const diff = Math.round((dt-today)/864e5);
+    const label = dt.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+    const color = diff < 0 ? '#A32D2D' : diff === 0 ? '#854F0B' : diff <= 3 ? '#854F0B' : '#5F5E5A';
+    const prefix = diff < 0 ? 'Overdue · ' : diff === 0 ? 'Due today · ' : '';
+    return `<span style="font-size:11px;color:${color};font-weight:500;">📅 ${prefix}${label}</span>`;
+  }
+
   function mkList(arr,id) {
     const el=document.getElementById(id);
     if(!arr.length){el.innerHTML='<div style="font-size:13px;color:var(--text-3);">None</div>';return;}
     el.innerHTML=arr.map(t=>{
       const sub=SUBJECTS.find(s=>s.id===t.subject);
-      return `<div class="todo-item">
-        <div class="checkbox ${t.done?'done':''}" onclick="toggleTodo('${t.id}')"></div>
-        <span style="flex:1;font-size:14px;${t.done?'text-decoration:line-through;color:var(--text-3)':''}">${t.name}</span>
-        ${sub?`<span class="tag" style="background:${sub.bg};color:${sub.color};">${sub.name.split(' ')[0]}</span>`:''}
-        <span class="tag" style="background:${priB[t.priority||'normal']};color:${priC[t.priority||'normal']};">${t.priority||'normal'}</span>
-        <button class="del-btn" onclick="delTodo('${t.id}')">×</button>
+      return `<div class="todo-item" style="flex-wrap:wrap;gap:6px;">
+        <div style="display:flex;align-items:center;gap:10px;width:100%;">
+          <div class="checkbox ${t.done?'done':''}" onclick="toggleTodo('${t.id}')"></div>
+          <span style="flex:1;font-size:14px;font-weight:500;${t.done?'text-decoration:line-through;color:var(--text-3)':''}">${t.name}</span>
+          ${sub?`<span class="tag" style="background:${sub.bg};color:${sub.color};">${sub.name.split(' ')[0]}</span>`:''}
+          <span class="tag" style="background:${priB[t.priority||'normal']};color:${priC[t.priority||'normal']};">${t.priority||'normal'}</span>
+          <button class="del-btn" onclick="delTodo('${t.id}')">×</button>
+        </div>
+        ${(t.duedate||t.notes) ? `<div style="padding-left:28px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
+          ${t.duedate ? fmtDue(t.duedate) : ''}
+          ${t.notes ? `<span style="font-size:12px;color:var(--text-2);">📝 ${t.notes}</span>` : ''}
+        </div>` : ''}
       </div>`;
     }).join('');
   }
@@ -1536,20 +1774,39 @@ function renderTodos() {
 
 window.toggleTodoForm = function() {
   const wrap = document.getElementById('todo-form-wrap');
+  const btn = document.getElementById('todo-add-btn');
   const isVisible = wrap.style.display !== 'none';
   wrap.style.display = isVisible ? 'none' : 'block';
-  if (!isVisible) document.getElementById('todo-input').focus();
+  btn.textContent = isVisible ? '+ Add Task' : '✕ Close';
+  if (!isVisible) {
+    // Pre-select the subject of whichever panel is currently open
+    const openId = getOpenSubjects()[0];
+    const sel = document.getElementById('todo-subject');
+    if(openId && sel) sel.value = openId;
+    document.getElementById('todo-input').focus();
+  }
 };
 window.addTodo = function() {
   const inp=document.getElementById('todo-input'); const v=inp.value.trim(); if(!v) return;
   if(!state.todos) state.todos=[];
-  state.todos.unshift({id:Date.now()+'',name:v,done:false,subject:document.getElementById('todo-subject').value,priority:document.getElementById('todo-priority').value});
+  state.todos.unshift({
+    id:Date.now()+'',
+    name:v,
+    done:false,
+    subject:document.getElementById('todo-subject').value,
+    priority:document.getElementById('todo-priority').value,
+    duedate:document.getElementById('todo-duedate').value||'',
+    notes:document.getElementById('todo-notes').value.trim()||''
+  });
   inp.value='';
+  document.getElementById('todo-duedate').value='';
+  document.getElementById('todo-notes').value='';
   document.getElementById('todo-form-wrap').style.display='none';
-  renderTodos();renderStats();saveState();
+  document.getElementById('todo-add-btn').textContent='+ Add Task';
+  renderTodos(); renderSubjects(); renderStats(); saveState();
 };
-window.toggleTodo = function(id){const t=state.todos.find(t=>t.id===id);if(t){t.done=!t.done;renderTodos();renderStats();saveState();}};
-window.delTodo = function(id){state.todos=state.todos.filter(t=>t.id!==id);renderTodos();renderStats();saveState();};
+window.toggleTodo = function(id){const t=state.todos.find(t=>t.id===id);if(t){t.done=!t.done;renderTodos();renderSubjects();renderStats();saveState();}};
+window.delTodo = function(id){state.todos=state.todos.filter(t=>t.id!==id);renderTodos();renderSubjects();renderStats();saveState();};
 
 function populateDropdowns() {
   ['sched-subj','todo-subject'].forEach(id => {
@@ -1563,7 +1820,7 @@ window.switchTab = function(name) {
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('tab-'+name).classList.add('active');
-  const tabs=['courses','notes','tracker','schedule','syllabus','timer','calendar','help'];
+  const tabs=['courses','notes','tracker','schedule','syllabus','timer','calendar','agreements','help'];
   document.querySelectorAll('.nav-btn')[tabs.indexOf(name)].classList.add('active');
   if(name==='timer') startClock();
   if(name==='notes') initNotesTab();
@@ -1577,7 +1834,7 @@ const NOTE_SUBJECT_NAMES = {
   personalfin:'Personal Finance', commservices:'Comm Services', pe:'PE',
   jrtransition:'Jr Transition Seminar', heartful:'Heartful Life Mgmt',
   dadtutorial:'Dad Tutorial', momtutorial:'Mom Tutorial',
-  studyhr:'Study/Reading', socialskills:'Social Skills',
+  studyhr:'Study/Reading', socialskills:'Social Skills', '':'General',
 };
 
 const AUTHOR_COLORS = {
@@ -2283,6 +2540,248 @@ window.switchTimerSub = function(name) {
 
 // --- ANALOG CLOCK ---
 let clockRAF = null;
+// =================== AGREEMENTS ===================
+let agrEditingId = null;
+
+const AGR_CATEGORY_COLORS = {
+  'Attendance':   {bg:'#E6F1FB', color:'#0C447C'},
+  'Respect':      {bg:'#EAF3DE', color:'#27500A'},
+  'Academics':    {bg:'#FAEEDA', color:'#633806'},
+  'Technology':   {bg:'#EEEDFE', color:'#3C3489'},
+  'Health':       {bg:'#E1F5EE', color:'#0F6E56'},
+  'Communication':{bg:'#FBEAF0', color:'#72243E'},
+};
+
+function agrCategoryStyle(cat) {
+  if(!cat) return null;
+  const key = Object.keys(AGR_CATEGORY_COLORS).find(k => cat.toLowerCase().includes(k.toLowerCase()));
+  return key ? AGR_CATEGORY_COLORS[key] : {bg:'#F1EFE8', color:'#444441'};
+}
+
+window.toggleAgrForm = function() {
+  const wrap = document.getElementById('agr-form-wrap');
+  const btn = document.getElementById('agr-toggle-btn');
+  const isOpen = wrap.style.display !== 'none';
+  if(isOpen) { cancelAgrEdit(); return; }
+  agrEditingId = null;
+  document.getElementById('agr-form-title').textContent = 'Add an Agreement';
+  document.getElementById('agr-save-btn').textContent = 'Save Agreement';
+  document.getElementById('agr-text-input').value = '';
+  document.getElementById('agr-category-input').value = '';
+  wrap.style.display = 'block';
+  btn.textContent = '✕ Close';
+  document.getElementById('agr-text-input').focus();
+};
+
+window.cancelAgrEdit = function() {
+  agrEditingId = null;
+  document.getElementById('agr-form-wrap').style.display = 'none';
+  document.getElementById('agr-toggle-btn').textContent = '+ Add';
+  document.getElementById('agr-form-title').textContent = 'Add an Agreement';
+};
+
+window.editAgreement = function(id) {
+  const a = (state.agreements||[]).find(a=>a.id===id);
+  if(!a) return;
+  agrEditingId = id;
+  document.getElementById('agr-text-input').value = a.text;
+  document.getElementById('agr-category-input').value = a.category||'';
+  document.getElementById('agr-form-title').textContent = 'Edit Agreement';
+  document.getElementById('agr-save-btn').textContent = 'Update Agreement';
+  document.getElementById('agr-form-wrap').style.display = 'block';
+  document.getElementById('agr-toggle-btn').textContent = '✕ Close';
+  document.getElementById('agr-text-input').focus();
+  document.getElementById('agr-form-wrap').scrollIntoView({behavior:'smooth', block:'center'});
+};
+
+window.saveAgreement = function() {
+  const text = document.getElementById('agr-text-input').value.trim();
+  const category = document.getElementById('agr-category-input').value.trim();
+  if(!text) { alert('Please write the agreement first.'); return; }
+  if(!state.agreements) state.agreements = [];
+  if(agrEditingId) {
+    const a = state.agreements.find(a=>a.id===agrEditingId);
+    if(a) { a.text = text; a.category = category; }
+  } else {
+    state.agreements.push({ id: Date.now()+'', text, category, created: new Date().toISOString() });
+  }
+  cancelAgrEdit();
+  renderAgreements();
+  saveState();
+};
+
+window.deleteAgreement = function(id) {
+  if(!confirm('Remove this agreement?')) return;
+  state.agreements = (state.agreements||[]).filter(a=>a.id!==id);
+  renderAgreements(); saveState();
+};
+
+window.moveAgreement = function(id, dir) {
+  const list = state.agreements||[];
+  const idx = list.findIndex(a=>a.id===id);
+  const newIdx = idx + dir;
+  if(newIdx < 0 || newIdx >= list.length) return;
+  [list[idx], list[newIdx]] = [list[newIdx], list[idx]];
+  renderAgreements(); saveState();
+};
+
+function renderAgreements() {
+  const el = document.getElementById('agr-list');
+  if(!el) return;
+  const list = state.agreements||[];
+  if(!list.length) {
+    el.innerHTML = `<div class="card" style="text-align:center;padding:2.5rem 1rem;color:var(--text-3);">
+      <div style="font-size:32px;margin-bottom:10px;">📜</div>
+      <div style="font-weight:600;margin-bottom:4px;">No agreements yet</div>
+      <div style="font-size:13px;">Click "+ Add" above to write your first homeschool agreement together.</div>
+    </div>`;
+    return;
+  }
+  el.innerHTML = `<div class="card" style="padding:0;">
+    ${list.map((a,i) => {
+      const cs = agrCategoryStyle(a.category);
+      return `<div class="agr-row">
+        <div class="agr-number">${i+1}</div>
+        <div class="agr-body">
+          <div class="agr-text">${a.text}</div>
+          ${a.category ? `<span class="agr-cat-tag" style="background:${cs.bg};color:${cs.color};">${a.category}</span>` : ''}
+        </div>
+        <div class="agr-actions">
+          <button class="agr-move-btn" onclick="moveAgreement('${a.id}',-1)" ${i===0?'disabled':''} title="Move up">↑</button>
+          <button class="agr-move-btn" onclick="moveAgreement('${a.id}',1)" ${i===list.length-1?'disabled':''} title="Move down">↓</button>
+          <button class="agr-edit-btn" onclick="editAgreement('${a.id}')" title="Edit">✏️</button>
+          <button class="del-btn" onclick="deleteAgreement('${a.id}')" title="Delete">×</button>
+        </div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+// =================== END AGREEMENTS ===================
+
+// =================== ALARM SYSTEM ===================
+let alarmAudioCtx = null;
+let alarmRinging = null;
+
+function playAlarmBeep() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const pattern = [0, 0.3, 0.6, 0.9];
+    pattern.forEach(t => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.frequency.value = 880;
+      osc.type = 'sine';
+      gain.gain.setValueAtTime(0.4, ctx.currentTime + t);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + t + 0.25);
+      osc.start(ctx.currentTime + t);
+      osc.stop(ctx.currentTime + t + 0.25);
+    });
+  } catch(e) {}
+}
+
+function startRepeatingAlarm() {
+  stopRepeatingAlarm();
+  playAlarmBeep();
+  alarmAudioCtx = setInterval(playAlarmBeep, 3000);
+}
+function stopRepeatingAlarm() {
+  if(alarmAudioCtx) { clearInterval(alarmAudioCtx); alarmAudioCtx = null; }
+}
+
+window.addAlarm = function() {
+  const time = document.getElementById('alarm-time-input').value;
+  const label = document.getElementById('alarm-label-input').value.trim() || 'Alarm';
+  const repeat = document.getElementById('alarm-repeat-input').value;
+  if(!time) { alert('Please set a time for the alarm.'); return; }
+  if(!state.alarms) state.alarms = [];
+  state.alarms.push({ id: Date.now()+'', time, label, repeat, enabled: true });
+  document.getElementById('alarm-label-input').value = '';
+  renderAlarms();
+  saveState();
+};
+
+window.toggleAlarm = function(id) {
+  const a = (state.alarms||[]).find(a=>a.id===id);
+  if(a) { a.enabled = !a.enabled; renderAlarms(); saveState(); }
+};
+
+window.deleteAlarm = function(id) {
+  state.alarms = (state.alarms||[]).filter(a=>a.id!==id);
+  renderAlarms(); saveState();
+};
+
+window.dismissAlarm = function() {
+  stopRepeatingAlarm();
+  document.getElementById('alarm-banner').style.display = 'none';
+  alarmRinging = null;
+};
+
+function checkAlarms() {
+  const now = new Date();
+  const hh = String(now.getHours()).padStart(2,'0');
+  const mm = String(now.getMinutes()).padStart(2,'0');
+  const ss = now.getSeconds();
+  const day = now.getDay(); // 0=Sun,6=Sat
+  const currentTime = `${hh}:${mm}`;
+  if(ss !== 0) return; // only check at the top of each minute
+  (state.alarms||[]).forEach(a => {
+    if(!a.enabled || a.time !== currentTime) return;
+    if(alarmRinging === a.id) return;
+    const isWeekday = day >= 1 && day <= 5;
+    const isWeekend = day === 0 || day === 6;
+    if(a.repeat === 'weekdays' && !isWeekday) return;
+    if(a.repeat === 'weekends' && !isWeekend) return;
+    // Fire the alarm
+    alarmRinging = a.id;
+    const banner = document.getElementById('alarm-banner');
+    document.getElementById('alarm-banner-label').textContent = a.label;
+    document.getElementById('alarm-banner-time').textContent = formatAlarmTime(a.time);
+    banner.style.display = 'block';
+    startRepeatingAlarm();
+    // Auto-dismiss once alarms after 1 min if not dismissed
+    if(a.repeat === 'once') {
+      setTimeout(()=>{ if(alarmRinging===a.id) dismissAlarm(); }, 60000);
+    }
+  });
+}
+
+function formatAlarmTime(t) {
+  const [h,m] = t.split(':').map(Number);
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  const h12 = h % 12 || 12;
+  return `${h12}:${String(m).padStart(2,'0')} ${ampm}`;
+}
+
+const REPEAT_LABELS = { once:'One time', daily:'Every day', weekdays:'Weekdays', weekends:'Weekends' };
+
+function renderAlarms() {
+  const el = document.getElementById('alarm-list');
+  if(!el) return;
+  const alarms = state.alarms || [];
+  if(!alarms.length) {
+    el.innerHTML = `<div class="card" style="text-align:center;padding:1.5rem;color:var(--text-3);font-size:13px;">No alarms set</div>`;
+    return;
+  }
+  el.innerHTML = `<div class="card">${alarms.map(a => `
+    <div class="alarm-row">
+      <div class="alarm-time-display" style="${!a.enabled?'opacity:0.4':''}">${formatAlarmTime(a.time)}</div>
+      <div class="alarm-info" style="${!a.enabled?'opacity:0.4':''}">
+        <div class="alarm-label-text">${a.label}</div>
+        <div class="alarm-repeat-text">${REPEAT_LABELS[a.repeat]||a.repeat}</div>
+      </div>
+      <label class="alarm-toggle">
+        <input type="checkbox" ${a.enabled?'checked':''} onchange="toggleAlarm('${a.id}')">
+        <span class="alarm-slider"></span>
+      </label>
+      <button class="del-btn" onclick="deleteAlarm('${a.id}')" title="Delete">×</button>
+    </div>`).join('')}</div>`;
+}
+
+// Check alarms every second (only fires at top of minute)
+setInterval(checkAlarms, 1000);
+// =================== END ALARM SYSTEM ===================
+
 function startClock() {
   if(clockRAF) cancelAnimationFrame(clockRAF);
   drawClock();
@@ -2367,10 +2866,15 @@ function drawHand(ctx, cx, cy, angle, length, width, color) {
 
 // --- POMODORO ---
 let pomInterval=null, pomRunning=false, pomSecs=25*60;
+function getPomFocusMins(){ return parseInt(document.getElementById('pom-focus-mins')?.value||25); }
+function getPomBreakMins(){ return parseInt(document.getElementById('pom-break-mins')?.value||5); }
+function getPomRounds(){ return parseInt(document.getElementById('pom-rounds')?.value||4); }
+
 window.resetTimer = function() {
   clearInterval(pomInterval); pomRunning=false;
   document.getElementById('start-btn').textContent='▶ Start';
-  pomPhase='focus'; pomSecs=25*60;
+  pomPhase='focus'; pomCount=0;
+  pomSecs = getPomFocusMins()*60;
   document.getElementById('timer-sublabel').textContent='Focus session';
   renderPomDots(); updatePomDisplay();
 };
@@ -2381,15 +2885,36 @@ window.toggleTimer = function() {
 function pomTick() {
   pomSecs--;
   if(pomSecs<=0){
-    logSess(pomPhase==='focus'?'Focus block':'Break', pomPhase==='focus'?25*60:5*60, 'timer-log');
-    if(pomPhase==='focus'){pomCount++;pomPhase='break';pomSecs=5*60;document.getElementById('timer-sublabel').textContent='Break time! 🎉';}
-    else{pomPhase='focus';pomSecs=25*60;document.getElementById('timer-sublabel').textContent='Focus session';}
+    const focusMins = getPomFocusMins();
+    const breakMins = getPomBreakMins();
+    const rounds = getPomRounds();
+    logSess(pomPhase==='focus'?'Focus block':'Break', pomPhase==='focus'?focusMins*60:breakMins*60, 'timer-log');
+    playAlarmBeep();
+    if(pomPhase==='focus'){
+      pomCount++;
+      if(pomCount >= rounds){
+        // All rounds done
+        clearInterval(pomInterval); pomRunning=false;
+        pomPhase='done';
+        document.getElementById('timer-sublabel').textContent='All done! 🎉';
+        document.getElementById('start-btn').textContent='▶ Start';
+        renderPomDots(); updatePomDisplay(); return;
+      }
+      pomPhase='break'; pomSecs=breakMins*60;
+      document.getElementById('timer-sublabel').textContent='Break time! 🎉';
+    } else {
+      pomPhase='focus'; pomSecs=focusMins*60;
+      document.getElementById('timer-sublabel').textContent='Focus session';
+    }
     renderPomDots();
   }
   updatePomDisplay();
 }
 function updatePomDisplay(){const m=Math.floor(pomSecs/60),s=pomSecs%60;document.getElementById('timer-digits').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');}
-function renderPomDots(){document.getElementById('pom-dots').innerHTML=Array.from({length:4},(_,i)=>`<div class="pom-dot ${i<pomCount?'done':''}"></div>`).join('');}
+function renderPomDots(){
+  const rounds = getPomRounds();
+  document.getElementById('pom-dots').innerHTML=Array.from({length:rounds},(_,i)=>`<div class="pom-dot ${i<pomCount?'done':''}"></div>`).join('');
+}
 
 // --- COUNTDOWN ---
 let cdInterval=null, cdRunning=false, cdSecs=30*60;
