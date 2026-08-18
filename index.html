@@ -244,7 +244,22 @@ select { font-size: 13px; padding: 7px 8px; border: 1px solid var(--border); bor
 .syl-unit-title { font-size:13px; font-weight:600; color:var(--text); margin-bottom:4px; }
 .syl-unit p { font-size:13px; color:var(--text-2); line-height:1.5; margin:0; }
 .syl-placeholder { text-align:center; padding:3rem 1rem; color:var(--text-2); }
-.agr-row { display:flex; align-items:flex-start; gap:12px; padding:14px 16px; border-bottom:1px solid var(--border); }
+.wh-q-num { font-size:12px;font-weight:700;color:var(--blue);min-width:24px;font-family:'DM Mono',monospace; }
+.wh-assignment-card { background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:12px;box-shadow:var(--shadow);overflow:hidden; }
+.wh-card-header { padding:12px 16px;background:var(--bg);border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:10px; }
+.wh-card-title { font-size:15px;font-weight:600;color:var(--text); }
+.wh-card-dates { font-size:12px;color:var(--text-3);margin-top:3px;display:flex;gap:12px; }
+.wh-date-item { display:flex;align-items:center;gap:4px; }
+.wh-status-badge { font-size:11px;padding:3px 10px;border-radius:99px;font-weight:600;white-space:nowrap;flex-shrink:0; }
+.wh-q-block { padding:14px 16px;border-bottom:1px solid var(--border); }
+.wh-q-block:last-child { border-bottom:none; }
+.wh-question-text { font-size:13px;font-weight:600;color:var(--text);margin-bottom:8px;display:flex;gap:8px; }
+.wh-answer-wrap { margin-top:6px; }
+.wh-answer-label { font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-3);margin-bottom:4px; }
+.wh-answer-input { width:100%;font-size:13px;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);font-family:inherit;resize:vertical;min-height:72px;line-height:1.6; }
+.wh-answer-input:focus { outline:none;border-color:var(--blue);background:var(--surface); }
+.wh-answered { background:#EAF3DE;border-color:#90C060; }
+ align-items:flex-start; gap:12px; padding:14px 16px; border-bottom:1px solid var(--border); }
 .agr-row:last-child { border-bottom:none; }
 .agr-row:hover { background:var(--bg); }
 .agr-number { font-size:18px; font-weight:700; color:var(--blue); min-width:28px; padding-top:1px; font-family:'DM Mono',monospace; }
@@ -508,10 +523,64 @@ select { font-size: 13px; padding: 7px 8px; border: 1px solid var(--border); bor
       <!-- One blank panel per subject; content to be defined later -->
       <div id="trk-worldhistory" class="trk-panel">
         <div class="syl-header" style="background:#FAEEDA;border-color:#D4A867;">
-          <div class="syl-course-title" style="color:#854F0B;">World History</div>
-          <div class="syl-meta">Activity tracker</div>
+          <div class="syl-course-title" style="color:#854F0B;">World History — Assignment Tracker</div>
+          <div class="syl-meta">Dad adds questions/tasks · Caden fills in answers</div>
         </div>
-        <div class="syl-body"><div class="syl-placeholder"><div style="font-size:32px;margin-bottom:12px;">📊</div><div style="font-weight:600;margin-bottom:6px;">Tracker not yet configured</div><div style="font-size:13px;color:var(--text-3);">Let us know what to track for this course (e.g. hours, count of activities) and we'll build it here.</div></div></div>
+        <div class="syl-body">
+          <div class="stat-grid" id="wh-stats" style="margin-bottom:1.25rem;"></div>
+
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+            <div class="section-label" style="margin-bottom:0;">Assignments</div>
+            <button onclick="toggleWHForm()" id="wh-form-toggle-btn" class="btn-sm primary" style="font-size:12px;padding:5px 12px;">+ Add Assignment</button>
+          </div>
+
+          <div style="display:flex;gap:6px;margin-bottom:14px;border-bottom:1px solid var(--border);padding-bottom:12px;flex-wrap:wrap;">
+            <button class="btn-sm" onclick="printWHSummary()" title="Opens a print-friendly view — use Print to save as PDF">🖨 Print / Save PDF</button>
+            <button class="btn-sm" onclick="copyWHSummary()" id="wh-copy-btn">📋 Copy as Text</button>
+          </div>
+
+          <div id="wh-form-wrap" style="display:none;margin-bottom:1.25rem;">
+            <div class="card">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+                <div>
+                  <div class="section-label" style="margin-bottom:4px;">Assigned Date</div>
+                  <input type="date" id="wh-assigned" style="width:100%;font-size:13px;padding:0 8px;height:36px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);font-family:inherit;">
+                </div>
+                <div>
+                  <div class="section-label" style="margin-bottom:4px;">Due Date</div>
+                  <input type="date" id="wh-due" style="width:100%;font-size:13px;padding:0 8px;height:36px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);font-family:inherit;">
+                </div>
+              </div>
+              <div style="margin-bottom:10px;">
+                <div class="section-label" style="margin-bottom:4px;">Assignment Title <span style="text-transform:none;font-weight:400;color:var(--text-3);">(e.g. Unit 3 — Ch.14 Questions)</span></div>
+                <input type="text" id="wh-title" placeholder="e.g. Early Modern Times — Review Questions"
+                  style="width:100%;font-size:13px;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);font-family:inherit;">
+              </div>
+              <div style="margin-bottom:12px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+                  <div class="section-label" style="margin-bottom:0;">Questions / Tasks</div>
+                  <button onclick="addWHQuestion()" class="btn-sm" style="font-size:12px;padding:4px 10px;">+ Add Question</button>
+                </div>
+                <div id="wh-questions-wrap">
+                  <div class="wh-q-row" data-index="0">
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                      <span class="wh-q-num">Q1</span>
+                      <input type="text" class="wh-q-input" placeholder="Enter question or task…"
+                        style="flex:1;font-size:13px;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);font-family:inherit;">
+                      <button onclick="removeWHQuestion(this)" class="del-btn" style="font-size:16px;">×</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div style="display:flex;gap:8px;">
+                <button class="btn-sm primary" onclick="saveWHAssignment()" style="flex:1;">Save Assignment</button>
+                <button class="btn-sm" onclick="toggleWHForm()">Cancel</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="wh-assignment-list"></div>
+        </div>
       </div>
 
       <div id="trk-ushistory" class="trk-panel" style="display:none;">
@@ -544,6 +613,21 @@ select { font-size: 13px; padding: 7px 8px; border: 1px solid var(--border); bor
           <div class="syl-meta">Activity tracker · Young Men's Service League (YMSL)</div>
         </div>
         <div class="syl-body">
+          <!-- Reflection Template Banner -->
+          <div style="background:#FFF9EC;border:1px solid #E8C96A;border-radius:var(--radius);padding:14px 16px;margin-bottom:1.25rem;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+              <span style="font-size:16px;">📝</span>
+              <span style="font-size:13px;font-weight:700;color:#7A5500;">Reflection Write-Up Template</span>
+              <span style="font-size:11px;color:#9A7020;margin-left:4px;">Use this guide for your Personal Reflection field</span>
+            </div>
+            <ol style="font-size:13px;color:#633806;line-height:1.8;padding-left:18px;margin:0;">
+              <li>What is the organization I just volunteered for? Explain this organization.</li>
+              <li>What is the job that I just volunteered for? Describe everything that I did.</li>
+              <li>In what ways did I help in what I did, or, what values did I create by my effort?</li>
+              <li>What are the people who would benefit from my community services, and how and why did they benefit?</li>
+              <li>Did I enjoy the job? Would I do it again? What are my overall thoughts on my experience?</li>
+            </ol>
+          </div>
           <div class="stat-grid" id="cs-stats" style="margin-bottom:1.25rem;"></div>
 
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
@@ -563,6 +647,7 @@ select { font-size: 13px; padding: 7px 8px; border: 1px solid var(--border); bor
 
           <div id="cs-form-wrap" style="display:none;margin-bottom:1.25rem;">
             <div class="card">
+              <div class="section-label" style="margin-bottom:10px;" id="cs-form-title">Log New Activity</div>
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
                 <div>
                   <div class="section-label" style="margin-bottom:4px;">Organization(s) Served</div>
@@ -592,7 +677,7 @@ select { font-size: 13px; padding: 7px 8px; border: 1px solid var(--border); bor
                 <textarea id="cs-reflection" placeholder="What did Caden learn? How did this activity impact the community?" style="width:100%;min-height:70px;font-size:13px;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);font-family:inherit;resize:vertical;"></textarea>
               </div>
               <div style="display:flex;gap:8px;">
-                <button class="btn-sm primary" onclick="saveCSActivity()" style="flex:1;">Save Activity</button>
+                <button class="btn-sm primary" id="cs-save-btn" onclick="saveCSActivity()" style="flex:1;">Save Activity</button>
                 <button class="btn-sm" onclick="toggleCSForm()">Cancel</button>
               </div>
             </div>
@@ -733,9 +818,12 @@ select { font-size: 13px; padding: 7px 8px; border: 1px solid var(--border); bor
 
       <!-- Category + course sub-tab bar -->
       <div id="syl-nav" style="margin-bottom:1.25rem;">
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;">
+          <button class="syl-btn active" onclick="showSyl('generalinfo')">🏫 General Information</button>
+        </div>
         <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text-3);margin-bottom:6px;">Core Classes</div>
         <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;">
-          <button class="syl-btn active" onclick="showSyl('worldhistory')">World History</button>
+          <button class="syl-btn" onclick="showSyl('worldhistory')">World History</button>
           <button class="syl-btn" onclick="showSyl('ushistory')">US History</button>
           <button class="syl-btn" onclick="showSyl('eng11')">Eng 11 A/B</button>
           <button class="syl-btn" onclick="showSyl('personalfin')">Personal Finance</button>
@@ -756,8 +844,26 @@ select { font-size: 13px; padding: 7px 8px; border: 1px solid var(--border); bor
         </div>
       </div>
 
+      <!-- GENERAL INFORMATION -->
+      <div id="syl-generalinfo" class="syl-panel">
+        <div class="syl-header" style="background:#E6F1FB;border-color:#A8CCE8;">
+          <div class="syl-course-title" style="color:#0C447C;">🏫 General School Information</div>
+          <div class="syl-meta">Ocean Grove Charter School · 2026–27 · IEM Schools</div>
+        </div>
+        <div class="syl-body">
+          <div class="syl-section">
+            <div class="syl-section-title">School Information &amp; Notes</div>
+            <p style="font-size:13px;color:var(--text-3);margin-bottom:10px;">Write any important school information here — contacts, policies, links, procedures, or anything else. Changes save automatically.</p>
+            <textarea id="gi-main" class="note"
+              style="width:100%;min-height:400px;font-size:14px;line-height:1.7;"
+              placeholder="Start writing your school information here…"
+              onchange="saveGeneralInfo('main',this.value)"></textarea>
+          </div>
+        </div>
+      </div>
+
       <!-- WORLD HISTORY -->
-      <div id="syl-worldhistory" class="syl-panel">
+      <div id="syl-worldhistory" class="syl-panel" style="display:none;">
         <div class="syl-header" style="background:#FAEEDA;border-color:#D4A867;">
           <div class="syl-course-title" style="color:#854F0B;">World History A &amp; B</div>
           <div class="syl-meta">IEM Schools · Ocean Grove Charter School · 5.0 credits</div>
@@ -872,13 +978,115 @@ select { font-size: 13px; padding: 7px 8px; border: 1px solid var(--border); bor
       <div id="syl-eng11" class="syl-panel" style="display:none;">
         <div class="syl-header" style="background:#EAF3DE;border-color:#90C060;">
           <div class="syl-course-title" style="color:#3B6D11;">English 11 A/B</div>
-          <div class="syl-meta">IEM Schools · Ocean Grove Charter School · 5.0 credits</div>
+          <div class="syl-meta">Angela Underwood · aunderwood@ieminc.org · (530) 442-4853 · Ocean Grove Charter School · 5.0 credits/semester</div>
         </div>
         <div class="syl-body">
-          <div class="syl-placeholder">
-            <div style="font-size:32px;margin-bottom:12px;">📄</div>
-            <div style="font-weight:600;margin-bottom:6px;">Syllabus not yet uploaded</div>
-            <div style="font-size:13px;color:var(--text-3);">Upload the Eng 11 A/B syllabus PDF and we'll add it here.</div>
+          <div class="syl-section">
+            <div class="syl-section-title">Course Overview</div>
+            <p>Special Education English 11 (non a-g) / Literature and Composition Basics 3. Designed for students whose English Language Arts performance is two or more years below grade level. Provides scaffolded, grade-level instruction across three literary units with a wide variety of themes spanning both semesters. Emphasizes academic vocabulary, reading comprehension, fluency, critical thinking, problem-solving, and collaboration.</p>
+          </div>
+          <div class="syl-section">
+            <div class="syl-section-title">Class Schedule &amp; Zoom</div>
+            <p>Live Zoom sessions: <strong>Mondays &amp; Wednesdays</strong> · Office Hours: Mon/Wed 2:15–2:45pm</p>
+            <p style="margin-top:6px;">Zoom Office Hours: <a href="https://us02web.zoom.us/j/81154360221" style="color:var(--blue);">https://us02web.zoom.us/j/81154360221</a></p>
+          </div>
+          <div class="syl-section">
+            <div class="syl-section-title">Grading</div>
+            <div class="syl-two-col">
+              <div class="syl-grade-item"><span class="syl-pct">15%</span><span>Attendance &amp; Class Participation</span></div>
+              <div class="syl-grade-item"><span class="syl-pct">55%</span><span>Process Assignments</span></div>
+              <div class="syl-grade-item"><span class="syl-pct">30%</span><span>Product Assignments</span></div>
+            </div>
+            <div style="margin-top:10px;font-size:13px;color:var(--text-2);">
+              <strong>Daily participation (4 pts):</strong> On time/prepared (1pt) · Camera on full face (1pt) · Active participation (2pts)
+            </div>
+            <div style="margin-top:8px;font-size:13px;color:var(--text-2);">
+              A: 90–100 · B: 80–89 · C: 70–79 · D: 60–69 · F: below 60
+            </div>
+          </div>
+          <div class="syl-section">
+            <div class="syl-section-title">Late Work Policy</div>
+            <p>On-time work earns full credit. Late work receives a 20% deduction. Work more than 2 weeks past the deadline is not accepted. Extensions must be requested before the due date.</p>
+          </div>
+          <div class="syl-section">
+            <div class="syl-section-title">Tools &amp; Platforms</div>
+            <div class="syl-unit">
+              <div class="syl-unit-title">Schoology</div>
+              <p>Main platform for assignments, grades, attendance, and class recordings (available 2 weeks post-session).</p>
+            </div>
+            <div class="syl-unit">
+              <div class="syl-unit-title">CommonLit</div>
+              <p>Online literacy program with reading lessons, annotations, read-aloud, and Guided Reading Mode. Log in via IEM Google account.</p>
+            </div>
+            <div class="syl-unit">
+              <div class="syl-unit-title">IXL</div>
+              <p>Free school-provided account for individualized English Language skills practice. Homework/classwork credit given for IXL work.</p>
+            </div>
+            <div class="syl-unit">
+              <div class="syl-unit-title">Kami</div>
+              <p>Google extension for filling out and submitting worksheets directly to Schoology. Must be signed into school Google account.</p>
+            </div>
+          </div>
+          <div class="syl-section">
+            <div class="syl-section-title">Monthly Pacing Guide</div>
+            <div class="syl-unit">
+              <div class="syl-unit-title">Aug – Sep: Introduction to English 11</div>
+              <p>Schoology/Zoom setup · Grammar review · CommonLit, Kami, IXL orientation · Reading diagnostic · Plagiarism · Paragraph writing (SUTW) · Central/Main idea · Summarizing</p>
+            </div>
+            <div class="syl-unit">
+              <div class="syl-unit-title">Sep – Nov: Unit 1 — Not That Different</div>
+              <p>How does "othering" affect individuals and humanity? Close reading · Vocabulary · Character interactions · Mood &amp; Point of View · Inferences · Expository essay writing · Grammar</p>
+            </div>
+            <div class="syl-unit">
+              <div class="syl-unit-title">Dec – Jan: Unit 2 — Conveying Courage</div>
+              <p>What is courage? Close reading · Vocabulary · Context &amp; meaning · Main/Central idea · Citing evidence · Journalistic writing · Grammar</p>
+            </div>
+            <div class="syl-unit">
+              <div class="syl-unit-title">Jan – Mar: Unit 3 — Graffiti: Art or Crime?</div>
+              <p>Is graffiti art or crime? Close reading · Critical thinking · Research · Debate · Vocabulary · Persuasive/Argumentative essay writing · Grammar</p>
+            </div>
+            <div class="syl-unit">
+              <div class="syl-unit-title">Mar – May: Unit 4 — People and the Environment</div>
+              <p>How do people and the environment affect each other? Close reading · Evidence &amp; claims · Theme development · Vocabulary · Allegory &amp; symbolism · Discussion · Grammar</p>
+            </div>
+          </div>
+          <div class="syl-section">
+            <div class="syl-section-title">Writing Rubric (5-point scale)</div>
+            <div style="overflow-x:auto;">
+              <table style="width:100%;border-collapse:collapse;font-size:12px;">
+                <thead>
+                  <tr style="background:var(--bg);">
+                    <th style="padding:7px 10px;text-align:left;border-bottom:2px solid var(--border);">Category</th>
+                    <th style="padding:7px 10px;text-align:center;border-bottom:2px solid var(--border);color:#0C447C;">5 Advanced</th>
+                    <th style="padding:7px 10px;text-align:center;border-bottom:2px solid var(--border);color:#27500A;">4 Proficient</th>
+                    <th style="padding:7px 10px;text-align:center;border-bottom:2px solid var(--border);color:#633806;">3 Developing</th>
+                    <th style="padding:7px 10px;text-align:center;border-bottom:2px solid var(--border);color:#72243E;">2 Emerging</th>
+                    <th style="padding:7px 10px;text-align:center;border-bottom:2px solid var(--border);color:#5F5E5A;">1 Beginning</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${[
+                    ['Thesis / Claim','Clear, insightful thesis; previews major ideas','Clear thesis; introduces main ideas','Present but broad or unclear','Vague or missing key elements','No clear thesis'],
+                    ['Ideas & Development','Thoroughly developed with insight and connections','Clearly developed with relevant connections','Some development; may be repetitive','Ideas stated but minimal explanation','Minimal or unrelated to thesis'],
+                    ['Evidence & Elaboration','Strong, well-selected evidence; smoothly integrated','Relevant evidence; generally explained','Some evidence; may be weak or unclear','Limited evidence; minimal explanation','Little to no evidence'],
+                    ['Organization','Clear intro, logical body, effective transitions, strong conclusion','Clear structure with some transitions','Basic structure; weak transitions','Inconsistent or confusing','No clear structure'],
+                    ['Language & Conventions','Precise language; minimal errors','Clear language; minor errors','Some errors; occasionally interrupt clarity','Frequent errors; parts difficult to understand','Persistent errors; significantly impair readability'],
+                    ['MLA Format & Citations','Consistently correct MLA format and citations','Mostly correct; minor errors','Some MLA elements; errors occur','Limited MLA; incomplete citations','No MLA format or citations'],
+                  ].map(r=>`<tr style="border-bottom:1px solid var(--border);">
+                    <td style="padding:7px 10px;font-weight:600;">${r[0]}</td>
+                    ${r.slice(1).map(c=>`<td style="padding:7px 10px;color:var(--text-2);">${c}</td>`).join('')}
+                  </tr>`).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="syl-section">
+            <div class="syl-section-title">AI Use Policy</div>
+            <p>AI tools (e.g. ChatGPT) may only be used when explicitly permitted by the teacher. If allowed: document and share your full AI conversation, and cite AI use in MLA or APA format. Unauthorized AI use is an academic integrity violation.</p>
+          </div>
+          <div class="syl-section">
+            <div class="syl-section-title">Class Expectations</div>
+            <p>Computer (not phone/tablet) required · Reliable internet required · Camera on full face during all live sessions · Arrive on time with homework completed · Respectful language and participation · Sit upright at a desk or table — no lying down during class.</p>
           </div>
         </div>
       </div>
@@ -1499,6 +1707,11 @@ function renderAll() {
   renderStats(); renderSubjects(); renderSchedule(); renderCredits();
   renderTodos(); populateDropdowns(); renderTimerLog(); renderCalendar(); renderHelpState();
   renderAlarms(); renderAgreements();
+  // Tracker panels — only render if currently visible
+  if(document.getElementById('trk-worldhistory')?.style.display !== 'none') renderWHTracker();
+  if(document.getElementById('trk-commservices')?.style.display !== 'none') renderCSTracker();
+  if(document.getElementById('trk-pe')?.style.display !== 'none') renderPETracker();
+  if(document.getElementById('trk-studyhr')?.style.display !== 'none') renderRDTracker();
 }
 
 function renderStats() {
@@ -2014,20 +2227,318 @@ window.showTrk = function(id) {
   if(id==='commservices') renderCSTracker();
   if(id==='pe') renderPETracker();
   if(id==='studyhr') renderRDTracker();
+  if(id==='worldhistory') renderWHTracker();
+};
+
+// =================== WORLD HISTORY TRACKER ===================
+let whQCount = 1;
+
+window.toggleWHForm = function() {
+  const wrap = document.getElementById('wh-form-wrap');
+  const btn = document.getElementById('wh-form-toggle-btn');
+  const isOpen = wrap.style.display !== 'none';
+  wrap.style.display = isOpen ? 'none' : 'block';
+  btn.textContent = isOpen ? '+ Add Assignment' : '✕ Close';
+  if(!isOpen) {
+    document.getElementById('wh-assigned').value = new Date().toISOString().split('T')[0];
+    document.getElementById('wh-due').value = '';
+    document.getElementById('wh-title').value = '';
+    // Reset to single question
+    whQCount = 1;
+    document.getElementById('wh-questions-wrap').innerHTML = `
+      <div class="wh-q-row" data-index="0">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+          <span class="wh-q-num">Q1</span>
+          <input type="text" class="wh-q-input" placeholder="Enter question or task…"
+            style="flex:1;font-size:13px;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);font-family:inherit;">
+          <button onclick="removeWHQuestion(this)" class="del-btn" style="font-size:16px;">×</button>
+        </div>
+      </div>`;
+    document.getElementById('wh-title').focus();
+  }
+};
+
+window.addWHQuestion = function() {
+  whQCount++;
+  const wrap = document.getElementById('wh-questions-wrap');
+  const div = document.createElement('div');
+  div.className = 'wh-q-row';
+  div.innerHTML = `<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+    <span class="wh-q-num">Q${whQCount}</span>
+    <input type="text" class="wh-q-input" placeholder="Enter question or task…"
+      style="flex:1;font-size:13px;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);font-family:inherit;">
+    <button onclick="removeWHQuestion(this)" class="del-btn" style="font-size:16px;">×</button>
+  </div>`;
+  wrap.appendChild(div);
+  div.querySelector('input').focus();
+  renumberWHQuestions();
+};
+
+window.removeWHQuestion = function(btn) {
+  const row = btn.closest('.wh-q-row');
+  const wrap = document.getElementById('wh-questions-wrap');
+  if(wrap.querySelectorAll('.wh-q-row').length <= 1) return; // keep at least one
+  row.remove();
+  renumberWHQuestions();
+};
+
+function renumberWHQuestions() {
+  document.querySelectorAll('#wh-questions-wrap .wh-q-num').forEach((el,i) => {
+    el.textContent = `Q${i+1}`;
+  });
+  whQCount = document.querySelectorAll('#wh-questions-wrap .wh-q-row').length;
+}
+
+window.saveWHAssignment = function() {
+  const assigned = document.getElementById('wh-assigned').value;
+  const due = document.getElementById('wh-due').value;
+  const title = document.getElementById('wh-title').value.trim();
+  const questions = Array.from(document.querySelectorAll('#wh-questions-wrap .wh-q-input'))
+    .map(inp => inp.value.trim()).filter(Boolean);
+  if(!title) { alert('Please enter an assignment title.'); return; }
+  if(!questions.length) { alert('Please add at least one question.'); return; }
+  if(!state.whAssignments) state.whAssignments = [];
+  state.whAssignments.unshift({
+    id: Date.now()+'',
+    assigned, due, title,
+    questions: questions.map(q => ({q, answer:''})),
+    created: new Date().toISOString()
+  });
+  toggleWHForm();
+  renderWHTracker();
+  saveState();
+};
+
+window.saveWHAnswer = function(assignId, qIdx, value) {
+  const a = (state.whAssignments||[]).find(a=>a.id===assignId);
+  if(!a || !a.questions[qIdx]) return;
+  a.questions[qIdx].answer = value;
+  renderWHStats();
+  saveState();
+};
+
+window.deleteWHAssignment = function(id) {
+  if(!confirm('Delete this assignment?')) return;
+  state.whAssignments = (state.whAssignments||[]).filter(a=>a.id!==id);
+  renderWHTracker();
+  saveState();
+};
+
+function whDueStatus(due) {
+  if(!due) return null;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const d = new Date(due+'T12:00:00');
+  const diff = Math.round((d-today)/864e5);
+  if(diff < 0) return {label:'Overdue', bg:'#FCEBEB', color:'#A32D2D'};
+  if(diff === 0) return {label:'Due today', bg:'#FAEEDA', color:'#633806'};
+  if(diff <= 3) return {label:`Due in ${diff}d`, bg:'#FFF9C4', color:'#7A6500'};
+  return {label:`Due ${d.toLocaleDateString('en-US',{month:'short',day:'numeric'})}`, bg:'#F1EFE8', color:'#5F5E5A'};
+}
+
+function isAssignmentComplete(a) {
+  return a.questions.every(q => q.answer && q.answer.trim().length > 0);
+}
+
+function renderWHStats() {
+  const list = state.whAssignments||[];
+  const total = list.length;
+  const complete = list.filter(a=>isAssignmentComplete(a)).length;
+  const totalQs = list.reduce((sum,a)=>sum+a.questions.length,0);
+  const answeredQs = list.reduce((sum,a)=>sum+a.questions.filter(q=>q.answer&&q.answer.trim()).length,0);
+  document.getElementById('wh-stats').innerHTML = `
+    <div class="stat-card"><div class="stat-num">${complete}/${total}</div><div class="stat-lbl">Assignments done</div></div>
+    <div class="stat-card"><div class="stat-num">${answeredQs}/${totalQs}</div><div class="stat-lbl">Questions answered</div></div>
+    <div class="stat-card"><div class="stat-num">${total?Math.round(answeredQs/totalQs*100)||0:0}%</div><div class="stat-lbl">Overall progress</div></div>
+  `;
+}
+
+function renderWHTracker() {
+  if(!state.whAssignments) state.whAssignments = [];
+  const list = document.getElementById('wh-assignment-list');
+
+  renderWHStats();
+
+  if(!state.whAssignments.length) {
+    list.innerHTML = `<div class="card" style="text-align:center;padding:2rem;color:var(--text-3);">
+      <div style="font-size:28px;margin-bottom:8px;">📖</div>
+      <div style="font-weight:500;margin-bottom:4px;">No assignments yet</div>
+      <div style="font-size:13px;">Click "+ Add Assignment" to create the first World History assignment for Caden.</div>
+    </div>`;
+    return;
+  }
+
+  list.innerHTML = state.whAssignments.map(a => {
+    const complete = isAssignmentComplete(a);
+    const dueStatus = whDueStatus(a.due);
+    const answeredCount = a.questions.filter(q=>q.answer&&q.answer.trim()).length;
+    const assignedStr = a.assigned ? new Date(a.assigned+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '—';
+    const dueStr = a.due ? new Date(a.due+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '—';
+    const statusBg = complete ? '#EAF3DE' : '#F1EFE8';
+    const statusColor = complete ? '#27500A' : '#5F5E5A';
+    const statusLabel = complete ? '✓ Complete' : `${answeredCount}/${a.questions.length} answered`;
+
+    return `<div class="wh-assignment-card">
+      <div class="wh-card-header">
+        <div>
+          <div class="wh-card-title">${a.title}</div>
+          <div class="wh-card-dates">
+            <span class="wh-date-item">📅 Assigned: ${assignedStr}</span>
+            <span class="wh-date-item">⏰ Due: ${dueStr}</span>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+          ${dueStatus && !complete ? `<span class="wh-status-badge" style="background:${dueStatus.bg};color:${dueStatus.color};">${dueStatus.label}</span>` : ''}
+          <span class="wh-status-badge" style="background:${statusBg};color:${statusColor};">${statusLabel}</span>
+          <button class="del-btn" onclick="deleteWHAssignment('${a.id}')" title="Delete">×</button>
+        </div>
+      </div>
+      ${a.questions.map((qa,i) => `
+        <div class="wh-q-block">
+          <div class="wh-question-text">
+            <span class="wh-q-num">Q${i+1}</span>
+            <span>${qa.q}</span>
+          </div>
+          <div class="wh-answer-wrap">
+            <div class="wh-answer-label">Caden's Answer</div>
+            <textarea class="wh-answer-input ${qa.answer&&qa.answer.trim()?'wh-answered':''}"
+              placeholder="Write your answer here…"
+              onchange="saveWHAnswer('${a.id}',${i},this.value)"
+              oninput="this.className='wh-answer-input'+(this.value.trim()?' wh-answered':'')"
+            >${qa.answer||''}</textarea>
+          </div>
+        </div>`).join('')}
+    </div>`;
+  }).join('');
+}
+// =================== END WORLD HISTORY TRACKER ===================
+
+function buildWHSummaryText() {
+  const list = state.whAssignments||[];
+  const total = list.length;
+  const complete = list.filter(a=>isAssignmentComplete(a)).length;
+  const totalQs = list.reduce((sum,a)=>sum+a.questions.length,0);
+  const answeredQs = list.reduce((sum,a)=>sum+a.questions.filter(q=>q.answer&&q.answer.trim()).length,0);
+  let txt = `CADEN — WORLD HISTORY ASSIGNMENTS\n`;
+  txt += `Generated: ${new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}\n`;
+  txt += `Assignments: ${complete}/${total} complete  |  Questions answered: ${answeredQs}/${totalQs}\n`;
+  txt += `${'='.repeat(60)}\n\n`;
+  list.slice().sort((a,b)=>a.assigned.localeCompare(b.assigned)).forEach((a,i) => {
+    const assigned = a.assigned ? new Date(a.assigned+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '—';
+    const due = a.due ? new Date(a.due+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '—';
+    txt += `${i+1}. ${a.title}\n`;
+    txt += `   Assigned: ${assigned}  |  Due: ${due}\n`;
+    a.questions.forEach((qa,qi) => {
+      txt += `\n   Q${qi+1}: ${qa.q}\n`;
+      txt += `   Answer: ${qa.answer&&qa.answer.trim() ? qa.answer.trim() : '(not answered)'}\n`;
+    });
+    txt += `\n${'—'.repeat(50)}\n\n`;
+  });
+  return txt;
+}
+
+window.copyWHSummary = function() {
+  const txt = buildWHSummaryText();
+  navigator.clipboard.writeText(txt).then(() => {
+    const btn = document.getElementById('wh-copy-btn');
+    const orig = btn.textContent;
+    btn.textContent = '✓ Copied!';
+    setTimeout(()=>{ btn.textContent = orig; }, 2000);
+  }).catch(() => { alert('Could not copy automatically.\n\n' + txt); });
+};
+
+window.printWHSummary = function() {
+  const list = (state.whAssignments||[]).slice().sort((a,b)=>a.assigned.localeCompare(b.assigned));
+  const total = list.length;
+  const complete = list.filter(a=>isAssignmentComplete(a)).length;
+  const totalQs = list.reduce((sum,a)=>sum+a.questions.length,0);
+  const answeredQs = list.reduce((sum,a)=>sum+a.questions.filter(q=>q.answer&&q.answer.trim()).length,0);
+  const win = window.open('', '_blank');
+  const rows = list.map((a,i) => {
+    const assigned = a.assigned ? new Date(a.assigned+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '—';
+    const due = a.due ? new Date(a.due+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '—';
+    const qs = a.questions.map((qa,qi) => `
+      <div style="margin-bottom:14px;">
+        <div style="font-size:12px;font-weight:700;color:#185FA5;margin-bottom:4px;">Q${qi+1}: ${qa.q}</div>
+        <div style="font-size:13px;color:#1A1917;padding:8px 12px;background:#F7F6F3;border-radius:6px;min-height:36px;line-height:1.6;">
+          ${qa.answer&&qa.answer.trim() ? qa.answer.trim().replace(/\n/g,'<br>') : '<span style="color:#9B9891;font-style:italic;">Not answered</span>'}
+        </div>
+      </div>`).join('');
+    const status = isAssignmentComplete(a);
+    return `<div style="margin-bottom:24px;page-break-inside:avoid;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;padding:10px 14px;background:#FAEEDA;border-radius:8px 8px 0 0;border:1px solid #D4A867;">
+        <div>
+          <div style="font-size:14px;font-weight:700;color:#854F0B;">${i+1}. ${a.title}</div>
+          <div style="font-size:11px;color:#9A7020;margin-top:2px;">Assigned: ${assigned} &nbsp;·&nbsp; Due: ${due}</div>
+        </div>
+        <span style="font-size:11px;padding:3px 10px;border-radius:99px;font-weight:600;background:${status?'#EAF3DE':'#F1EFE8'};color:${status?'#27500A':'#5F5E5A'};">${status?'✓ Complete':'Incomplete'}</span>
+      </div>
+      <div style="padding:14px;border:1px solid #D4A867;border-top:none;border-radius:0 0 8px 8px;">${qs}</div>
+    </div>`;
+  }).join('');
+  win.document.write(`<html><head><title>Caden — World History Assignments</title>
+  <style>
+    body { font-family:-apple-system,sans-serif; padding:30px; color:#1A1917; max-width:800px; margin:0 auto; }
+    h1 { font-size:20px; margin-bottom:4px; }
+    .meta { font-size:13px; color:#666; margin-bottom:6px; }
+    .stats { display:flex; gap:16px; margin-bottom:24px; flex-wrap:wrap; }
+    .stat { padding:8px 16px; background:#F1EFE8; border-radius:8px; }
+    .stat b { font-size:18px; display:block; }
+    @media print { body { padding:10px; } }
+  </style></head><body>
+  <h1>Caden — World History Assignments</h1>
+  <div class="meta">Generated ${new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}</div>
+  <div class="stats">
+    <div class="stat"><b>${complete}/${total}</b>Assignments complete</div>
+    <div class="stat"><b>${answeredQs}/${totalQs}</b>Questions answered</div>
+    <div class="stat"><b>${totalQs?Math.round(answeredQs/totalQs*100):0}%</b>Overall progress</div>
+  </div>
+  ${rows}
+  </body></html>`);
+  win.document.close();
+  setTimeout(()=>win.print(), 300);
 };
 
 // =================== COMM SERVICES TRACKER ===================
+let csEditingId = null;
+
 window.toggleCSForm = function() {
   const wrap = document.getElementById('cs-form-wrap');
   const btn = document.getElementById('cs-form-toggle-btn');
   const isOpen = wrap.style.display !== 'none';
-  wrap.style.display = isOpen ? 'none' : 'block';
-  btn.textContent = isOpen ? '+ Log Activity' : '✕ Close';
-  if(!isOpen) {
-    ['cs-org','cs-desc','cs-hours','cs-skills','cs-reflection'].forEach(id=>document.getElementById(id).value='');
-    document.getElementById('cs-date').value = new Date().toISOString().split('T')[0];
-    document.getElementById('cs-org').focus();
+  if(isOpen) {
+    wrap.style.display = 'none';
+    btn.textContent = '+ Log Activity';
+    csEditingId = null;
+    document.getElementById('cs-form-title').textContent = 'Log New Activity';
+    return;
   }
+  csEditingId = null;
+  document.getElementById('cs-form-title').textContent = 'Log New Activity';
+  document.getElementById('cs-save-btn').textContent = 'Save Activity';
+  ['cs-org','cs-desc','cs-skills','cs-reflection'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('cs-hours').value = '';
+  document.getElementById('cs-date').value = new Date().toISOString().split('T')[0];
+  wrap.style.display = 'block';
+  btn.textContent = '✕ Close';
+  document.getElementById('cs-org').focus();
+};
+
+window.editCSActivity = function(id) {
+  const a = (state.csActivities||[]).find(a=>a.id===id);
+  if(!a) return;
+  csEditingId = id;
+  document.getElementById('cs-org').value = a.org||'';
+  document.getElementById('cs-date').value = a.date||'';
+  document.getElementById('cs-desc').value = a.desc||'';
+  document.getElementById('cs-hours').value = a.hours||'';
+  document.getElementById('cs-skills').value = a.skills||'';
+  document.getElementById('cs-reflection').value = a.reflection||'';
+  document.getElementById('cs-form-title').textContent = 'Edit Activity';
+  document.getElementById('cs-save-btn').textContent = 'Update Activity';
+  const wrap = document.getElementById('cs-form-wrap');
+  wrap.style.display = 'block';
+  document.getElementById('cs-form-toggle-btn').textContent = '✕ Close';
+  wrap.scrollIntoView({behavior:'smooth', block:'center'});
 };
 
 window.saveCSActivity = function() {
@@ -2041,14 +2552,22 @@ window.saveCSActivity = function() {
   if(!org || !date) { alert('Please enter at least the organization and date.'); return; }
 
   if(!state.csActivities) state.csActivities = [];
-  state.csActivities.unshift({
-    id: Date.now()+'',
-    org, date, desc, hours, skills, reflection,
-    created: new Date().toISOString()
-  });
+
+  if(csEditingId) {
+    const a = state.csActivities.find(a=>a.id===csEditingId);
+    if(a) { a.org=org; a.date=date; a.desc=desc; a.hours=hours; a.skills=skills; a.reflection=reflection; }
+    csEditingId = null;
+  } else {
+    state.csActivities.unshift({
+      id: Date.now()+'',
+      org, date, desc, hours, skills, reflection,
+      created: new Date().toISOString()
+    });
+  }
 
   document.getElementById('cs-form-wrap').style.display = 'none';
   document.getElementById('cs-form-toggle-btn').textContent = '+ Log Activity';
+  document.getElementById('cs-form-title').textContent = 'Log New Activity';
   renderCSTracker();
   saveState();
 };
@@ -2093,6 +2612,7 @@ function renderCSTracker() {
           </div>
           <div style="display:flex;align-items:center;gap:8px;">
             <span class="cs-hours-badge">${a.hours} hr${a.hours!==1?'s':''}</span>
+            <button class="agr-edit-btn" onclick="editCSActivity('${a.id}')" title="Edit">✏️</button>
             <button class="del-btn" onclick="deleteCSActivity('${a.id}')" title="Delete">×</button>
           </div>
         </div>
@@ -2459,6 +2979,17 @@ window.showSyl = function(id) {
   const noteEl = document.querySelector('#syl-'+id+' textarea.note');
   if(noteEl && state.sylNotes && state.sylNotes[id]) noteEl.value = state.sylNotes[id];
   if(id==='commservices') renderYMSLLog();
+  if(id==='generalinfo') {
+    const gi = state.generalInfo||{};
+    const ta = document.getElementById('gi-main');
+    if(ta && gi['main']) ta.value = gi['main'];
+  }
+};
+
+window.saveGeneralInfo = function(key, val) {
+  if(!state.generalInfo) state.generalInfo = {};
+  state.generalInfo[key] = val;
+  saveState();
 };
 
 window.saveSylNote = function(id, val) {
