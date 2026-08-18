@@ -857,7 +857,7 @@ select { font-size: 13px; padding: 7px 8px; border: 1px solid var(--border); bor
             <textarea id="gi-main" class="note"
               style="width:100%;min-height:400px;font-size:14px;line-height:1.7;"
               placeholder="Start writing your school information here…"
-              onchange="saveGeneralInfo('main',this.value)"></textarea>
+              oninput="saveGeneralInfo('main',this.value)"></textarea>
           </div>
         </div>
       </div>
@@ -1707,6 +1707,9 @@ function renderAll() {
   renderStats(); renderSubjects(); renderSchedule(); renderCredits();
   renderTodos(); populateDropdowns(); renderTimerLog(); renderCalendar(); renderHelpState();
   renderAlarms(); renderAgreements();
+  // Restore general info text area whenever state loads
+  const ta = document.getElementById('gi-main');
+  if(ta && state.generalInfo && state.generalInfo['main']) ta.value = state.generalInfo['main'];
   // Tracker panels — only render if currently visible
   if(document.getElementById('trk-worldhistory')?.style.display !== 'none') renderWHTracker();
   if(document.getElementById('trk-commservices')?.style.display !== 'none') renderCSTracker();
@@ -2986,10 +2989,12 @@ window.showSyl = function(id) {
   }
 };
 
+let giSaveTimer = null;
 window.saveGeneralInfo = function(key, val) {
   if(!state.generalInfo) state.generalInfo = {};
   state.generalInfo[key] = val;
-  saveState();
+  clearTimeout(giSaveTimer);
+  giSaveTimer = setTimeout(() => saveState(), 600);
 };
 
 window.saveSylNote = function(id, val) {
