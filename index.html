@@ -110,7 +110,8 @@ textarea.note:focus { outline: none; border-color: var(--blue); }
 .sg-cell { background: var(--surface); padding: 4px 4px; font-size: 11px; min-height: 40px; display: flex; align-items: center; justify-content: center; }
 .sg-hdr { background: var(--bg); font-weight: 600; font-size: 11px; color: var(--text-2); }
 .sg-time { background: var(--bg); font-size: 10px; color: var(--text-3); justify-content: flex-start; padding-left: 8px; }
-.sg-block { border-radius: 4px; padding: 3px 4px; font-size: 10px; font-weight: 600; width: 100%; text-align: center; line-height: 1.2; word-break: break-word; overflow-wrap: anywhere; }
+.sg-block { border-radius: 4px; padding: 3px 4px; font-size: 10px; font-weight: 600; width: 100%; text-align: center; line-height: 1.2; word-break: break-word; overflow-wrap: anywhere; cursor: pointer; transition: opacity 0.15s; }
+.sg-block:hover { opacity: 0.75; }
 
 /* CREDITS TABLE */
 .credit-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
@@ -799,20 +800,39 @@ select { font-size: 13px; padding: 7px 8px; border: 1px solid var(--border); bor
       <div class="sg-wrap"><div class="schedule-grid" id="schedule-grid"></div></div>
       <div class="section-label">Credits summary</div>
       <div class="card" id="credits-list"></div>
-      <div class="section-label" style="margin-top:1rem;">Edit a block</div>
+      <div class="section-label" style="margin-top:1rem;">Edit a block <span style="text-transform:none;font-weight:400;color:var(--text-3);font-size:11px;">— tap any block above to edit it</span></div>
       <div class="card">
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px;">
-          <div><div class="section-label" style="margin-bottom:4px;">Day</div>
-            <select id="sched-day" style="width:100%;"><option>Mon</option><option>Tue</option><option>Wed</option><option>Thu</option><option>Fri</option></select></div>
-          <div><div class="section-label" style="margin-bottom:4px;">Time</div>
-            <select id="sched-time" style="width:100%;"><option>9am</option><option>10am</option><option>11am</option><option>Noon</option><option>1pm</option><option>2pm</option><option>3pm</option><option>Flex</option></select></div>
-          <div><div class="section-label" style="margin-bottom:4px;">Subject</div>
-            <select id="sched-subj" style="width:100%;"><option value="">— clear —</option></select></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+          <div>
+            <div class="section-label" style="margin-bottom:4px;">Day</div>
+            <select id="sched-day" style="width:100%;font-size:13px;padding:0 8px;height:36px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);font-family:inherit;">
+              <option>Mon</option><option>Tue</option><option>Wed</option><option>Thu</option><option>Fri</option>
+            </select>
+          </div>
+          <div>
+            <div class="section-label" style="margin-bottom:4px;">Subject</div>
+            <select id="sched-subj" onchange="toggleSchedCustom()" style="width:100%;font-size:13px;padding:0 8px;height:36px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);font-family:inherit;">
+              <option value="">— clear —</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+          <div>
+            <div class="section-label" style="margin-bottom:4px;">Start Time</div>
+            <select id="sched-start" style="width:100%;font-size:13px;padding:0 8px;height:36px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);font-family:inherit;"></select>
+          </div>
+          <div>
+            <div class="section-label" style="margin-bottom:4px;">End Time</div>
+            <select id="sched-end" style="width:100%;font-size:13px;padding:0 8px;height:36px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);font-family:inherit;"></select>
+          </div>
+        </div>
+        <div id="sched-custom-wrap" style="display:none;margin-bottom:10px;">
+          <div class="section-label" style="margin-bottom:4px;">Custom Description</div>
+          <input id="sched-custom-label" placeholder="Enter a description…" style="width:100%;font-size:13px;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);font-family:inherit;">
         </div>
         <button class="btn-sm primary" onclick="applyBlock()" style="width:100%;">Apply</button>
       </div>
     </div>
-
     <!-- SYLLABUS TAB -->
     <div id="tab-syllabus" class="tab">
 
@@ -1605,15 +1625,15 @@ const db = getFirestore(app);
 const STATE_DOC = doc(db, 'dashboard', 'state');
 
 const SUBJECTS = [
-  {id:'worldhistory', name:'World History',         color:'#854F0B', bg:'#FAEEDA', category:'core',      sessions:[{day:'Mon',time:'9am',cr:2.5},{day:'Thu',time:'9am',cr:2.5}]},
-  {id:'eng11',        name:'Eng 11 A/B',            color:'#3B6D11', bg:'#EAF3DE', category:'core',      sessions:[{day:'Mon',time:'Noon',cr:2.5},{day:'Wed',time:'Noon',cr:2.5}]},
-  {id:'ushistory',    name:'US History',            color:'#534AB7', bg:'#EEEDFE', category:'core',      sessions:[{day:'Tue',time:'2pm',cr:2.5},{day:'Thu',time:'2pm',cr:2.5}]},
-  {id:'personalfin',  name:'Personal Finance',      color:'#185FA5', bg:'#E6F1FB', category:'core',      sessions:[{day:'Tue',time:'Noon',cr:2.5},{day:'Thu',time:'Noon',cr:2.5}]},
+  {id:'worldhistory', name:'World History',         color:'#1E40AF', bg:'#DBEAFE', category:'core',      sessions:[{day:'Mon',time:'9am',cr:2.5},{day:'Thu',time:'9am',cr:2.5}]},
+  {id:'eng11',        name:'Eng 11 A/B',            color:'#1E40AF', bg:'#DBEAFE', category:'core',      sessions:[{day:'Mon',time:'Noon',cr:2.5},{day:'Wed',time:'Noon',cr:2.5}]},
+  {id:'ushistory',    name:'US History',            color:'#1E40AF', bg:'#DBEAFE', category:'core',      sessions:[{day:'Tue',time:'2pm',cr:2.5},{day:'Thu',time:'2pm',cr:2.5}]},
+  {id:'personalfin',  name:'Personal Finance',      color:'#1E40AF', bg:'#DBEAFE', category:'core',      sessions:[{day:'Tue',time:'Noon',cr:2.5},{day:'Thu',time:'Noon',cr:2.5}]},
   {id:'commservices', name:'Comm Services',         color:'#5F5E5A', bg:'#F1EFE8', category:'noncore',   sessions:[{day:'Mon',time:'Flex',cr:2.5}]},
   {id:'pe',           name:'PE',                    color:'#993C1D', bg:'#FAECE7', category:'noncore',   sessions:[{day:'Mon',time:'Flex2',cr:5.0}]},
-  {id:'jrtransition', name:'Jr Transition Seminar', color:'#993556', bg:'#FBEAF0', category:'noncore',   sessions:[{day:'Wed',time:'9am',cr:2.5}]},
-  {id:'heartful',     name:'Heartful Life Mgmt',    color:'#0F6E56', bg:'#E1F5EE', category:'noncore',   sessions:[{day:'Wed',time:'10am',cr:2.5}]},
-  {id:'dadtutorial',  name:'Dad Tutorial',          color:'#0C447C', bg:'#DDEEFF', category:'noncredit', sessions:[{day:'Tue',time:'9am',cr:0},{day:'Thu',time:'1pm',cr:0}]},
+  {id:'jrtransition', name:'Jr Transition Seminar', color:'#1E40AF', bg:'#DBEAFE', category:'noncore',   sessions:[{day:'Wed',time:'9am',cr:2.5}]},
+  {id:'heartful',     name:'Heartful Life Mgmt',    color:'#1E40AF', bg:'#DBEAFE', category:'noncore',   sessions:[{day:'Wed',time:'10am',cr:2.5}]},
+  {id:'dadtutorial',  name:'Dad Tutorial',          color:'#6B2D8B', bg:'#F3E8FF', category:'noncredit', sessions:[{day:'Tue',time:'9am',cr:0},{day:'Thu',time:'1pm',cr:0}]},
   {id:'momtutorial',  name:'Mom Tutorial',          color:'#6B2D8B', bg:'#F3E8FF', category:'noncredit', sessions:[{day:'Fri',time:'9am',cr:0},{day:'Wed',time:'1pm',cr:0}]},
   {id:'studyhr',      name:'Study/Reading',         color:'#2D6B4F', bg:'#E0F5EC', category:'noncredit', sessions:[{day:'Mon',time:'10am',cr:0},{day:'Tue',time:'10am',cr:0},{day:'Thu',time:'10am',cr:0},{day:'Fri',time:'10am',cr:0}]},
   {id:'socialskills', name:'Social Skills',         color:'#8B5E0C', bg:'#FFF3DC', category:'noncredit', sessions:[{day:'Mon',time:'1pm',cr:0}]},
@@ -1679,7 +1699,7 @@ async function saveState() {
   }, 800);
 }
 
-const SCHEDULE_VERSION = 7; // increment this to force-reset the schedule
+const SCHEDULE_VERSION = 10; // increment this to force-reset the schedule
 
 // Real-time listener
 onSnapshot(STATE_DOC, (snap) => {
@@ -1882,6 +1902,17 @@ window.toggleA = function(sid,i) { state.assignments[sid][i].done=!state.assignm
 window.delA = function(sid,i) { state.assignments[sid].splice(i,1); renderSubjects();renderStats();saveState(); };
 window.saveNote = function(sid,v) { state.assignments[sid+'_note']=v; saveState(); };
 
+function getSchedBlockDisplay(val) {
+  if(!val) return null;
+  // Custom write-in block
+  if(typeof val === 'object' && val.__custom__) {
+    return { name: val.label || 'Custom', bg:'#F1EFE8', color:'#444441' };
+  }
+  // Regular subject id string
+  const sub = SUBJECTS.find(s=>s.id===val);
+  return sub ? { name: sub.name, bg: sub.bg, color: sub.color } : null;
+}
+
 function renderSchedule() {
   const grid = document.getElementById('schedule-grid'); grid.innerHTML = '';
   const hdr = document.createElement('div'); hdr.className='sg-cell sg-hdr'; hdr.textContent=''; grid.appendChild(hdr);
@@ -1891,17 +1922,25 @@ function renderSchedule() {
     if(t==='Flex') {
       DAYS.forEach(d => {
         const c=document.createElement('div'); c.className='sg-cell'; c.style.cssText='display:flex;flex-direction:column;gap:2px;padding:3px;';
-        const s1=SUBJECTS.find(s=>s.id===state.schedule[d+'|Flex']);
-        const s2=SUBJECTS.find(s=>s.id===state.schedule[d+'|Flex2']);
-        if(s1) c.innerHTML+=`<div class="sg-block" style="background:${s1.bg};color:${s1.color};">${s1.name}</div>`;
-        if(s2) c.innerHTML+=`<div class="sg-block" style="background:${s2.bg};color:${s2.color};">${s2.name}</div>`;
+        const d1=getSchedBlockDisplay(state.schedule[d+'|Flex']);
+        const d2=getSchedBlockDisplay(state.schedule[d+'|Flex2']);
+        if(d1) c.innerHTML+=`<div class="sg-block" style="background:${d1.bg};color:${d1.color};" onclick="editSchedBlock('${d}','Flex')">${d1.name}</div>`;
+        if(d2) c.innerHTML+=`<div class="sg-block" style="background:${d2.bg};color:${d2.color};" onclick="editSchedBlock('${d}','Flex2')">${d2.name}</div>`;
         grid.appendChild(c);
       });
     } else {
       DAYS.forEach(d => {
-        const sid=state.schedule[d+'|'+t]; const sub=SUBJECTS.find(s=>s.id===sid);
+        const val = state.schedule[d+'|'+t];
+        const disp = getSchedBlockDisplay(val);
         const c=document.createElement('div'); c.className='sg-cell';
-        if(sub) c.innerHTML=`<div class="sg-block" style="background:${sub.bg};color:${sub.color};">${sub.name}</div>`;
+        if(disp) {
+          c.innerHTML=`<div class="sg-block" style="background:${disp.bg};color:${disp.color};" onclick="editSchedBlock('${d}','${t}')">${disp.name}</div>`;
+        } else {
+          // Empty cell — also clickable to add a block at that slot
+          c.style.cursor='pointer';
+          c.title=`Add block: ${d} ${t}`;
+          c.onclick = () => editSchedBlock(d, t);
+        }
         grid.appendChild(c);
       });
     }
@@ -1941,9 +1980,94 @@ function renderCredits() {
   document.getElementById('credits-list').innerHTML = html;
 }
 
+window.editSchedBlock = function(day, time) {
+  // Remember the original key so applyBlock can update/delete it correctly
+  document.getElementById('sched-day').dataset.originalKey = day + '|' + time;
+
+  // Set day
+  document.getElementById('sched-day').value = day;
+
+  // Set start time
+  const startEl = document.getElementById('sched-start');
+  // Convert old-format keys (9am, Noon, 1pm) to new value format (9:00, 12:00, 13:00)
+  function timeKeyToValue(t) {
+    if(t === 'Noon') return '12:00';
+    if(t === 'Flex' || t === 'Flex2') return 'Flex';
+    const m = t.match(/^(\d+)(?::(\d+))?(am|pm)$/i);
+    if(!m) return t;
+    let h = parseInt(m[1]);
+    const min = parseInt(m[2]||'0');
+    if(m[3].toLowerCase()==='pm' && h!==12) h+=12;
+    if(m[3].toLowerCase()==='am' && h===12) h=0;
+    return `${h}:${String(min).padStart(2,'0')}`;
+  }
+  const startVal = timeKeyToValue(time);
+  if(startEl) startEl.value = startVal;
+
+  // Set subject
+  const val = state.schedule[day+'|'+time];
+  const subjEl = document.getElementById('sched-subj');
+  if(typeof val === 'object' && val && val.__custom__) {
+    subjEl.value = '__custom__';
+    document.getElementById('sched-custom-wrap').style.display = 'block';
+    document.getElementById('sched-custom-label').value = val.label || '';
+    // Set end time
+    const endVal = val.end ? timeKeyToValue(val.end) : startVal;
+    if(document.getElementById('sched-end')) document.getElementById('sched-end').value = endVal;
+  } else {
+    subjEl.value = val || '';
+    document.getElementById('sched-custom-wrap').style.display = 'none';
+    // Try to set end time from stored end key
+    const endKey = state.schedule[day+'|'+time+'|end'];
+    const endVal = endKey ? timeKeyToValue(endKey) : startVal;
+    if(document.getElementById('sched-end')) document.getElementById('sched-end').value = endVal;
+  }
+
+  // Scroll form into view
+  const card = document.getElementById('sched-day').closest('.card');
+  if(card) card.scrollIntoView({ behavior:'smooth', block:'center' });
+
+  // Highlight the form briefly
+  card.style.outline = '2px solid var(--blue)';
+  setTimeout(() => { card.style.outline = ''; }, 1500);
+};
+
+window.toggleSchedCustom = function() {
+  const subj = document.getElementById('sched-subj').value;
+  document.getElementById('sched-custom-wrap').style.display = subj === '__custom__' ? 'block' : 'none';
+};
+
 window.applyBlock = function() {
-  const day=document.getElementById('sched-day').value, time=document.getElementById('sched-time').value, subj=document.getElementById('sched-subj').value;
-  if(subj) state.schedule[day+'|'+time]=subj; else delete state.schedule[day+'|'+time];
+  const day = document.getElementById('sched-day').value;
+  const start = document.getElementById('sched-start').value;
+  const end = document.getElementById('sched-end').value;
+  const subj = document.getElementById('sched-subj').value;
+  const customLabel = document.getElementById('sched-custom-label')?.value.trim() || '';
+
+  // Use the original key if editing an existing block, otherwise build new key from start time
+  const originalKey = document.getElementById('sched-day').dataset.originalKey;
+  const newKey = day + '|' + start;
+  const keyToUse = originalKey || newKey;
+
+  // If day changed, remove the old key and use new one
+  const activeKey = originalKey && originalKey.startsWith(day + '|') ? originalKey : newKey;
+
+  // Clear old key if it differs from the new key (e.g. day changed)
+  if(originalKey && originalKey !== activeKey) {
+    delete state.schedule[originalKey];
+  }
+
+  if(!subj) {
+    delete state.schedule[activeKey];
+  } else {
+    state.schedule[activeKey] = subj === '__custom__'
+      ? { __custom__: true, label: customLabel, end }
+      : subj;
+    state.schedule[activeKey + '|end'] = end;
+  }
+
+  // Clear the stored original key after applying
+  document.getElementById('sched-day').dataset.originalKey = '';
   state.scheduleVersion = SCHEDULE_VERSION;
   renderSchedule(); saveState();
 };
@@ -2024,11 +2148,40 @@ window.addTodo = function() {
 window.toggleTodo = function(id){const t=state.todos.find(t=>t.id===id);if(t){t.done=!t.done;renderTodos();renderSubjects();renderStats();saveState();}};
 window.delTodo = function(id){state.todos=state.todos.filter(t=>t.id!==id);renderTodos();renderSubjects();renderStats();saveState();};
 
+function buildTimeOptions() {
+  const opts = [];
+  // 8am to 6pm in 15-min increments
+  for(let h = 8; h <= 18; h++) {
+    for(let m = 0; m < 60; m += 15) {
+      if(h === 18 && m > 0) break;
+      const ampm = h < 12 ? 'am' : 'pm';
+      const h12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
+      const label = `${h12}:${String(m).padStart(2,'0')}${ampm}`;
+      const value = `${h}:${String(m).padStart(2,'0')}`;
+      opts.push(`<option value="${value}">${label}</option>`);
+    }
+  }
+  opts.push('<option value="Flex">Flex</option>');
+  return opts.join('');
+}
+
 function populateDropdowns() {
   ['sched-subj','todo-subject'].forEach(id => {
     const el=document.getElementById(id); if(!el) return;
     const ph=id==='sched-subj'?'<option value="">— clear —</option>':'<option value="">General</option>';
-    el.innerHTML=ph+SUBJECTS.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
+    const customOpt = id==='sched-subj' ? '<option value="__custom__">✏️ Custom / Write-in…</option>' : '';
+    el.innerHTML=ph+SUBJECTS.filter(s=>s.id!=='').map(s=>`<option value="${s.id}">${s.name}</option>`).join('')+customOpt;
+  });
+  // Populate time selects if not already done
+  const timeHTML = buildTimeOptions();
+  ['sched-start','sched-end'].forEach(id => {
+    const el = document.getElementById(id); if(!el) return;
+    if(!el.options.length) {
+      el.innerHTML = timeHTML;
+      // default start to 9am, end to 10am
+      if(id==='sched-start') el.value = '9:00';
+      if(id==='sched-end') el.value = '10:00';
+    }
   });
 }
 
