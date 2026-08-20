@@ -106,12 +106,14 @@ textarea.note:focus { outline: none; border-color: var(--blue); }
 
 /* SCHEDULE GRID */
 .sg-wrap { overflow-x: auto; margin-bottom: 1.25rem; }
-.schedule-grid { display: grid; grid-template-columns: 80px repeat(5, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; min-width: 460px; }
-.sg-cell { background: var(--surface); padding: 4px 4px; font-size: 11px; min-height: 40px; display: flex; align-items: center; justify-content: center; }
-.sg-hdr { background: var(--bg); font-weight: 600; font-size: 11px; color: var(--text-2); }
-.sg-time { background: var(--bg); font-size: 10px; color: var(--text-3); justify-content: flex-start; padding-left: 8px; }
-.sg-block { border-radius: 4px; padding: 3px 4px; font-size: 10px; font-weight: 600; width: 100%; text-align: center; line-height: 1.2; word-break: break-word; overflow-wrap: anywhere; cursor: pointer; transition: opacity 0.15s; }
-.sg-block:hover { opacity: 0.75; }
+.sg-table { border-collapse: collapse; width: 100%; min-width: 500px; font-family: var(--font-sans); table-layout: fixed; }
+.sg-table th { background: var(--bg); font-size: 11px; font-weight: 600; color: var(--text-2); padding: 8px 6px; text-align: center; border: 0.5px solid var(--border); }
+.sg-table .sg-time { background: var(--bg); font-size: 10px; color: var(--text-3); padding: 4px 8px; border: 0.5px solid var(--border); width: 72px; vertical-align: top; padding-top: 6px; white-space: nowrap; height: 36px; }
+.sg-table .sg-time.half { border-top: 0.5px dashed var(--border); font-size: 9px; }
+.sg-table td.sg-cell { border: 0.5px solid var(--border); padding: 3px; vertical-align: middle; height: 36px; cursor: pointer; }
+.sg-table td.sg-cell:hover { background: var(--bg); }
+.sg-block { border-radius: 5px; padding: 4px 5px; font-size: 10px; font-weight: 600; text-align: center; line-height: 1.3; height: 100%; min-height: 26px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: opacity 0.15s; }
+.sg-block:hover { opacity: 0.8; }
 
 /* CREDITS TABLE */
 .credit-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
@@ -285,6 +287,9 @@ select { font-size: 13px; padding: 7px 8px; border: 1px solid var(--border); bor
 .alarm-slider::before { content:''; position:absolute; width:16px; height:16px; left:3px; top:3px; background:white; border-radius:50%; transition:0.2s; box-shadow:0 1px 3px rgba(0,0,0,0.2); }
 .alarm-toggle input:checked + .alarm-slider { background:var(--blue); }
 .alarm-toggle input:checked + .alarm-slider::before { transform:translateX(18px); }
+.sched-color-swatch { width:28px;height:28px;border-radius:50%;cursor:pointer;transition:transform 0.15s;flex-shrink:0; }
+.sched-color-swatch:hover { transform:scale(1.15); }
+.sched-color-swatch.active { transform:scale(1.15); }
 @media (max-width: 600px) { .syl-two-col { grid-template-columns:1fr; } }
 
   .main { padding: 1rem; }
@@ -797,7 +802,7 @@ select { font-size: 13px; padding: 7px 8px; border: 1px solid var(--border); bor
 
     <div id="tab-schedule" class="tab">
       <div class="section-label">Weekly class schedule — Fall 2026</div>
-      <div class="sg-wrap"><div class="schedule-grid" id="schedule-grid"></div></div>
+      <div class="sg-wrap"><table class="sg-table" id="schedule-grid"></table></div>
       <div class="section-label">Credits summary</div>
       <div class="card" id="credits-list"></div>
       <div class="section-label" style="margin-top:1rem;">Edit a block <span style="text-transform:none;font-weight:400;color:var(--text-3);font-size:11px;">— tap any block above to edit it</span></div>
@@ -830,7 +835,22 @@ select { font-size: 13px; padding: 7px 8px; border: 1px solid var(--border); bor
           <div class="section-label" style="margin-bottom:4px;">Custom Description</div>
           <input id="sched-custom-label" placeholder="Enter a description…" style="width:100%;font-size:13px;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);font-family:inherit;">
         </div>
-        <button class="btn-sm primary" onclick="applyBlock()" style="width:100%;">Apply</button>
+        <div style="margin-bottom:10px;">
+          <div class="section-label" style="margin-bottom:6px;">Block Color <span style="text-transform:none;font-weight:400;color:var(--text-3);">(for custom blocks)</span></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;" id="sched-color-picker">
+            <div class="sched-color-swatch active" data-bg="#DBEAFE" data-color="#1E40AF" style="background:#DBEAFE;border:2px solid #1E40AF;" title="Blue"></div>
+            <div class="sched-color-swatch" data-bg="#F3E8FF" data-color="#6B2D8B" style="background:#F3E8FF;border:2px solid transparent;" title="Purple"></div>
+            <div class="sched-color-swatch" data-bg="#E0F5EC" data-color="#2D6B4F" style="background:#E0F5EC;border:2px solid transparent;" title="Green"></div>
+            <div class="sched-color-swatch" data-bg="#FFF3DC" data-color="#8B5E0C" style="background:#FFF3DC;border:2px solid transparent;" title="Amber"></div>
+            <div class="sched-color-swatch" data-bg="#FBEAF0" data-color="#993556" style="background:#FBEAF0;border:2px solid transparent;" title="Pink"></div>
+            <div class="sched-color-swatch" data-bg="#FAECE7" data-color="#993C1D" style="background:#FAECE7;border:2px solid transparent;" title="Coral"></div>
+            <div class="sched-color-swatch" data-bg="#F1EFE8" data-color="#5F5E5A" style="background:#F1EFE8;border:2px solid transparent;" title="Gray"></div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn-sm primary" onclick="applyBlock()" style="flex:1;">Apply</button>
+          <button class="btn-sm" onclick="deleteBlock()" style="color:#A32D2D;border-color:#A32D2D;" title="Remove this block from the schedule">Delete</button>
+        </div>
       </div>
     </div>
     <!-- SYLLABUS TAB -->
@@ -1641,7 +1661,7 @@ const SUBJECTS = [
 ];
 
 const DAYS = ['Mon','Tue','Wed','Thu','Fri'];
-const TIMES = ['9am','10am','11am','Noon','1pm','2pm','3pm','Flex'];
+const TIMES = ['9:00am','9:30am','10:00am','10:30am','11:00am','11:30am','12:00pm','12:30pm','1:00pm','1:30pm','2:00pm','2:30pm','3:00pm','3:30pm','4:00pm','Flex'];
 
 const FIXED_EVENTS = [
   {id:'fe1',title:'First Semester begins',date:'2026-08-17',type:'semester',fixed:true,semester:1},
@@ -1699,7 +1719,7 @@ async function saveState() {
   }, 800);
 }
 
-const SCHEDULE_VERSION = 10; // increment this to force-reset the schedule
+const SCHEDULE_VERSION = 11; // increment this to force-reset the schedule
 
 // Real-time listener
 onSnapshot(STATE_DOC, (snap) => {
@@ -1902,56 +1922,185 @@ window.toggleA = function(sid,i) { state.assignments[sid][i].done=!state.assignm
 window.delA = function(sid,i) { state.assignments[sid].splice(i,1); renderSubjects();renderStats();saveState(); };
 window.saveNote = function(sid,v) { state.assignments[sid+'_note']=v; saveState(); };
 
-function getSchedBlockDisplay(val) {
+// Time parsing helpers
+function timeKeyToMins(t) {
+  if(!t||t==='Flex'||t==='Flex2') return 9999;
+  if(t==='Noon') return 720;
+  if(/^\d+:\d+$/.test(t)){const[h,m]=t.split(':').map(Number);return h*60+m;}
+  const m=t.match(/^(\d+)(?::(\d+))?(am|pm)$/i);
+  if(!m) return 9999;
+  let h=parseInt(m[1]);const min=parseInt(m[2]||'0');
+  if(m[3].toLowerCase()==='pm'&&h!==12)h+=12;
+  if(m[3].toLowerCase()==='am'&&h===12)h=0;
+  return h*60+min;
+}
+function timeLabelToMins(label){
+  if(label==='Flex') return 9999;
+  const m=label.match(/^(\d+):(\d+)(am|pm)$/i);
+  if(!m) return 9999;
+  let h=parseInt(m[1]);const min=parseInt(m[2]);
+  if(m[3].toLowerCase()==='pm'&&h!==12)h+=12;
+  if(m[3].toLowerCase()==='am'&&h===12)h=0;
+  return h*60+min;
+}
+function timeKeyToValue(t){
+  if(t==='Noon') return '12:00';
+  if(t==='Flex'||t==='Flex2') return 'Flex';
+  if(/^\d+:\d+$/.test(t)) return t;
+  const m=t.match(/^(\d+)(?::(\d+))?(am|pm)$/i);
+  if(!m) return t;
+  let h=parseInt(m[1]);const min=parseInt(m[2]||'0');
+  if(m[3].toLowerCase()==='pm'&&h!==12)h+=12;
+  if(m[3].toLowerCase()==='am'&&h===12)h=0;
+  return `${h}:${String(min).padStart(2,'0')}`;
+}
+function getSchedBlockDisplay(val){
   if(!val) return null;
-  // Custom write-in block
-  if(typeof val === 'object' && val.__custom__) {
-    return { name: val.label || 'Custom', bg:'#F1EFE8', color:'#444441' };
-  }
-  // Regular subject id string
-  const sub = SUBJECTS.find(s=>s.id===val);
-  return sub ? { name: sub.name, bg: sub.bg, color: sub.color } : null;
+  if(typeof val==='object'&&val.__custom__)
+    return{name:val.label||'Custom',bg:val.bg||'#F1EFE8',color:val.color||'#444441'};
+  const sub=SUBJECTS.find(s=>s.id===val);
+  return sub?{name:sub.name,bg:sub.bg,color:sub.color}:null;
 }
-
-function renderSchedule() {
-  const grid = document.getElementById('schedule-grid'); grid.innerHTML = '';
-  const hdr = document.createElement('div'); hdr.className='sg-cell sg-hdr'; hdr.textContent=''; grid.appendChild(hdr);
-  DAYS.forEach(d => { const c=document.createElement('div'); c.className='sg-cell sg-hdr'; c.textContent=d; grid.appendChild(c); });
-  TIMES.forEach(t => {
-    const tc = document.createElement('div'); tc.className='sg-cell sg-time'; tc.textContent=t; grid.appendChild(tc);
-    if(t==='Flex') {
-      DAYS.forEach(d => {
-        const c=document.createElement('div'); c.className='sg-cell'; c.style.cssText='display:flex;flex-direction:column;gap:2px;padding:3px;';
-        const d1=getSchedBlockDisplay(state.schedule[d+'|Flex']);
-        const d2=getSchedBlockDisplay(state.schedule[d+'|Flex2']);
-        if(d1) c.innerHTML+=`<div class="sg-block" style="background:${d1.bg};color:${d1.color};" onclick="editSchedBlock('${d}','Flex')">${d1.name}</div>`;
-        if(d2) c.innerHTML+=`<div class="sg-block" style="background:${d2.bg};color:${d2.color};" onclick="editSchedBlock('${d}','Flex2')">${d2.name}</div>`;
-        grid.appendChild(c);
-      });
-    } else {
-      DAYS.forEach(d => {
-        const val = state.schedule[d+'|'+t];
-        const disp = getSchedBlockDisplay(val);
-        const c=document.createElement('div'); c.className='sg-cell';
-        if(disp) {
-          c.innerHTML=`<div class="sg-block" style="background:${disp.bg};color:${disp.color};" onclick="editSchedBlock('${d}','${t}')">${disp.name}</div>`;
-        } else {
-          // Empty cell — also clickable to add a block at that slot
-          c.style.cursor='pointer';
-          c.title=`Add block: ${d} ${t}`;
-          c.onclick = () => editSchedBlock(d, t);
-        }
-        grid.appendChild(c);
-      });
-    }
+function renderSchedule(){
+  const table=document.getElementById('schedule-grid');table.innerHTML='';
+  const slots=TIMES.filter(t=>t!=='Flex');
+  const blocksByDay={};
+  DAYS.forEach(d=>{blocksByDay[d]=[];});
+  Object.keys(state.schedule||{}).forEach(k=>{
+    if(k.includes('|end')) return;
+    const parts=k.split('|');const day=parts[0],timeKey=parts[1];
+    if(!DAYS.includes(day)||timeKey==='Flex'||timeKey==='Flex2') return;
+    const val=state.schedule[k];if(!val) return;
+    const startMins=timeKeyToMins(timeKey);
+    const endRaw=state.schedule[k+'|end'];
+    let endMins=endRaw?timeKeyToMins(endRaw):startMins+60;
+    if(endMins<=startMins)endMins=startMins+30;
+    blocksByDay[day].push({key:k,timeKey,startMins,endMins,val});
   });
+  const thead=document.createElement('thead');
+  thead.innerHTML=`<tr><th style="width:72px;"></th>${DAYS.map(d=>`<th>${d}</th>`).join('')}</tr>`;
+  table.appendChild(thead);
+  const tbody=document.createElement('tbody');
+  const consumed={};
+  slots.forEach((t,si)=>{
+    const rowMins=timeLabelToMins(t);
+    const isHalf=t.includes(':30');
+    const tr=document.createElement('tr');tr.style.height='36px';
+    const tc=document.createElement('td');
+    tc.className='sg-time'+(isHalf?' half':'');
+    tc.textContent=t;tr.appendChild(tc);
+    DAYS.forEach(d=>{
+      if(consumed[`${d}|${si}`]) return;
+      const block=blocksByDay[d].find(b=>b.startMins===rowMins);
+      const td=document.createElement('td');td.className='sg-cell';
+      if(block){
+        const disp=getSchedBlockDisplay(block.val);
+        const durMins=block.endMins-block.startMins;
+        const rowspan=Math.max(1,Math.round(durMins/30));
+        td.rowSpan=rowspan;td.style.verticalAlign='middle';
+        for(let r=1;r<rowspan;r++)consumed[`${d}|${si+r}`]=true;
+        if(disp)td.innerHTML=`<div class="sg-block" style="background:${disp.bg};color:${disp.color};" onclick="editSchedBlock('${d}','${block.timeKey}')">${disp.name}</div>`;
+      } else {
+        td.onclick=()=>editSchedBlock(d,t);
+        td.title=`Add: ${d} ${t}`;
+      }
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+  const flexTr=document.createElement('tr');flexTr.style.height='52px';
+  const flexTc=document.createElement('td');flexTc.className='sg-time';flexTc.textContent='Flex';
+  flexTr.appendChild(flexTc);
+  DAYS.forEach(d=>{
+    const td=document.createElement('td');td.className='sg-cell';td.style.cssText='vertical-align:top;padding:3px;';
+    const d1=getSchedBlockDisplay(state.schedule[d+'|Flex']);
+    const d2=getSchedBlockDisplay(state.schedule[d+'|Flex2']);
+    let html='';
+    if(d1)html+=`<div class="sg-block" style="background:${d1.bg};color:${d1.color};margin-bottom:2px;" onclick="editSchedBlock('${d}','Flex')">${d1.name}</div>`;
+    if(d2)html+=`<div class="sg-block" style="background:${d2.bg};color:${d2.color};" onclick="editSchedBlock('${d}','Flex2')">${d2.name}</div>`;
+    td.innerHTML=html;flexTr.appendChild(td);
+  });
+  tbody.appendChild(flexTr);table.appendChild(tbody);
 }
+window.editSchedBlock=function(day,time){
+  document.getElementById('sched-day').dataset.originalKey=day+'|'+time;
+  document.getElementById('sched-day').value=day;
+  const startVal=timeKeyToValue(time);
+  if(document.getElementById('sched-start'))document.getElementById('sched-start').value=startVal;
+  const val=state.schedule[day+'|'+time];
+  const subjEl=document.getElementById('sched-subj');
+  if(typeof val==='object'&&val&&val.__custom__){
+    subjEl.value='__custom__';
+    document.getElementById('sched-custom-wrap').style.display='block';
+    document.getElementById('sched-custom-label').value=val.label||'';
+    if(document.getElementById('sched-end'))document.getElementById('sched-end').value=val.end?timeKeyToValue(val.end):startVal;
+    const bg=val.bg||'#F1EFE8';
+    document.querySelectorAll('.sched-color-swatch').forEach(s=>{
+      s.classList.toggle('active',s.dataset.bg===bg);
+      s.style.borderColor=s.dataset.bg===bg?s.dataset.color:'transparent';
+    });
+  } else {
+    subjEl.value=val||'';
+    document.getElementById('sched-custom-wrap').style.display='none';
+    const endRaw=state.schedule[day+'|'+time+'|end'];
+    if(document.getElementById('sched-end'))document.getElementById('sched-end').value=endRaw?timeKeyToValue(endRaw):startVal;
+  }
+  const card=document.getElementById('sched-day').closest('.card');
+  if(card){card.scrollIntoView({behavior:'smooth',block:'center'});card.style.outline='2px solid var(--blue)';setTimeout(()=>{card.style.outline='';},1500);}
+};
+window.toggleSchedCustom=function(){
+  const subj=document.getElementById('sched-subj').value;
+  document.getElementById('sched-custom-wrap').style.display=subj==='__custom__'?'block':'none';
+};
+document.addEventListener('click',function(e){
+  const swatch=e.target.closest('.sched-color-swatch');if(!swatch) return;
+  document.querySelectorAll('.sched-color-swatch').forEach(s=>{s.classList.remove('active');s.style.borderColor='transparent';});
+  swatch.classList.add('active');swatch.style.borderColor=swatch.dataset.color;
+});
+function getSelectedColor(){
+  const active=document.querySelector('.sched-color-swatch.active');
+  return active?{bg:active.dataset.bg,color:active.dataset.color}:{bg:'#F1EFE8',color:'#444441'};
+}
+window.applyBlock=function(){
+  const day=document.getElementById('sched-day').value;
+  const start=document.getElementById('sched-start').value;
+  const end=document.getElementById('sched-end').value;
+  const subj=document.getElementById('sched-subj').value;
+  const customLabel=document.getElementById('sched-custom-label')?.value.trim()||'';
+  const originalKey=document.getElementById('sched-day').dataset.originalKey;
+  const activeKey=originalKey&&originalKey.startsWith(day+'|')?originalKey:day+'|'+start;
+  if(originalKey&&originalKey!==activeKey)delete state.schedule[originalKey];
+  if(!subj){
+    delete state.schedule[activeKey];
+    delete state.schedule[activeKey+'|end'];
+  } else {
+    const colr=getSelectedColor();
+    state.schedule[activeKey]=subj==='__custom__'
+      ?{__custom__:true,label:customLabel,end,bg:colr.bg,color:colr.color}
+      :subj;
+    state.schedule[activeKey+'|end']=end;
+  }
+  document.getElementById('sched-day').dataset.originalKey='';
+  state.scheduleVersion=SCHEDULE_VERSION;
+  renderSchedule();saveState();
+};
+
+
+window.deleteBlock = function() {
+  const originalKey = document.getElementById('sched-day').dataset.originalKey;
+  if(!originalKey) { alert('Tap a block on the schedule first to select it.'); return; }
+  if(!confirm('Remove this block from the schedule?')) return;
+  delete state.schedule[originalKey];
+  delete state.schedule[originalKey + '|end'];
+  document.getElementById('sched-day').dataset.originalKey = '';
+  state.scheduleVersion = SCHEDULE_VERSION;
+  renderSchedule(); saveState();
+};
 
 function renderCredits() {
   const creditedSubs = SUBJECTS.filter(s => semCr(s) > 0);
-  const nonCreditSubs = SUBJECTS.filter(s => semCr(s) === 0);
+  const nonCreditSubs = SUBJECTS.filter(s => semCr(s) === 0 && s.id !== '');
   const grandTotal = creditedSubs.reduce((sum,s)=>sum+semCr(s),0);
-
   let html = creditedSubs.map(s => {
     const total = semCr(s);
     const detail = s.sessions.map(sess=>`${sess.day} (${sess.cr})`).join(' + ');
@@ -1961,10 +2110,8 @@ function renderCredits() {
       <div style="font-weight:600;min-width:28px;text-align:right;">${total}</div>
     </div>`;
   }).join('');
-
   html += `<div class="credit-row" style="margin-top:4px;padding-top:12px;border-top:2px solid var(--border);border-bottom:1px solid var(--border);">
     <div style="font-weight:600;">Total fall semester credits</div><div style="font-weight:600;">${grandTotal}</div></div>`;
-
   if(nonCreditSubs.length) {
     html += `<div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--text-3);margin:14px 0 8px;">Non-credit sessions</div>`;
     html += nonCreditSubs.map(s => {
@@ -1976,101 +2123,8 @@ function renderCredits() {
       </div>`;
     }).join('');
   }
-
   document.getElementById('credits-list').innerHTML = html;
 }
-
-window.editSchedBlock = function(day, time) {
-  // Remember the original key so applyBlock can update/delete it correctly
-  document.getElementById('sched-day').dataset.originalKey = day + '|' + time;
-
-  // Set day
-  document.getElementById('sched-day').value = day;
-
-  // Set start time
-  const startEl = document.getElementById('sched-start');
-  // Convert old-format keys (9am, Noon, 1pm) to new value format (9:00, 12:00, 13:00)
-  function timeKeyToValue(t) {
-    if(t === 'Noon') return '12:00';
-    if(t === 'Flex' || t === 'Flex2') return 'Flex';
-    const m = t.match(/^(\d+)(?::(\d+))?(am|pm)$/i);
-    if(!m) return t;
-    let h = parseInt(m[1]);
-    const min = parseInt(m[2]||'0');
-    if(m[3].toLowerCase()==='pm' && h!==12) h+=12;
-    if(m[3].toLowerCase()==='am' && h===12) h=0;
-    return `${h}:${String(min).padStart(2,'0')}`;
-  }
-  const startVal = timeKeyToValue(time);
-  if(startEl) startEl.value = startVal;
-
-  // Set subject
-  const val = state.schedule[day+'|'+time];
-  const subjEl = document.getElementById('sched-subj');
-  if(typeof val === 'object' && val && val.__custom__) {
-    subjEl.value = '__custom__';
-    document.getElementById('sched-custom-wrap').style.display = 'block';
-    document.getElementById('sched-custom-label').value = val.label || '';
-    // Set end time
-    const endVal = val.end ? timeKeyToValue(val.end) : startVal;
-    if(document.getElementById('sched-end')) document.getElementById('sched-end').value = endVal;
-  } else {
-    subjEl.value = val || '';
-    document.getElementById('sched-custom-wrap').style.display = 'none';
-    // Try to set end time from stored end key
-    const endKey = state.schedule[day+'|'+time+'|end'];
-    const endVal = endKey ? timeKeyToValue(endKey) : startVal;
-    if(document.getElementById('sched-end')) document.getElementById('sched-end').value = endVal;
-  }
-
-  // Scroll form into view
-  const card = document.getElementById('sched-day').closest('.card');
-  if(card) card.scrollIntoView({ behavior:'smooth', block:'center' });
-
-  // Highlight the form briefly
-  card.style.outline = '2px solid var(--blue)';
-  setTimeout(() => { card.style.outline = ''; }, 1500);
-};
-
-window.toggleSchedCustom = function() {
-  const subj = document.getElementById('sched-subj').value;
-  document.getElementById('sched-custom-wrap').style.display = subj === '__custom__' ? 'block' : 'none';
-};
-
-window.applyBlock = function() {
-  const day = document.getElementById('sched-day').value;
-  const start = document.getElementById('sched-start').value;
-  const end = document.getElementById('sched-end').value;
-  const subj = document.getElementById('sched-subj').value;
-  const customLabel = document.getElementById('sched-custom-label')?.value.trim() || '';
-
-  // Use the original key if editing an existing block, otherwise build new key from start time
-  const originalKey = document.getElementById('sched-day').dataset.originalKey;
-  const newKey = day + '|' + start;
-  const keyToUse = originalKey || newKey;
-
-  // If day changed, remove the old key and use new one
-  const activeKey = originalKey && originalKey.startsWith(day + '|') ? originalKey : newKey;
-
-  // Clear old key if it differs from the new key (e.g. day changed)
-  if(originalKey && originalKey !== activeKey) {
-    delete state.schedule[originalKey];
-  }
-
-  if(!subj) {
-    delete state.schedule[activeKey];
-  } else {
-    state.schedule[activeKey] = subj === '__custom__'
-      ? { __custom__: true, label: customLabel, end }
-      : subj;
-    state.schedule[activeKey + '|end'] = end;
-  }
-
-  // Clear the stored original key after applying
-  document.getElementById('sched-day').dataset.originalKey = '';
-  state.scheduleVersion = SCHEDULE_VERSION;
-  renderSchedule(); saveState();
-};
 
 function renderTodos() {
   const todos = state.todos||[];
