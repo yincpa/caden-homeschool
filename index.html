@@ -70,7 +70,7 @@ body { font-family: 'DM Sans', system-ui, sans-serif; background: var(--bg); col
 
 /* SUBJECT CARDS */
 .subject-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 10px; box-shadow: var(--shadow); overflow: hidden; }
-.subject-header { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.25rem; cursor: pointer; }
+.subject-header { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.25rem; cursor: pointer; border-bottom: none; outline: none; }
 .subject-header:hover { background: var(--bg); }
 .subject-left { display: flex; align-items: center; gap: 10px; }
 .subject-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
@@ -79,8 +79,7 @@ body { font-family: 'DM Sans', system-ui, sans-serif; background: var(--bg); col
 .cr-badge { font-size: 11px; padding: 2px 8px; border-radius: 99px; background: var(--blue-light); color: var(--blue-dark); font-weight: 600; }
 .subject-count { font-size: 13px; color: var(--text-3); }
 .chevron { font-size: 18px; color: var(--text-3); transition: transform 0.2s; display: inline-block; }
-.prog-bar { height: 3px; background: var(--bg); }
-.prog-fill { height: 3px; transition: width 0.4s; }
+
 .subject-body { display: none; padding: 0 1.25rem 1.25rem; border-top: 1px solid var(--border); }
 .subject-body.open { display: block; }
 
@@ -287,7 +286,27 @@ select { font-size: 13px; padding: 7px 8px; border: 1px solid var(--border); bor
 .alarm-slider::before { content:''; position:absolute; width:16px; height:16px; left:3px; top:3px; background:white; border-radius:50%; transition:0.2s; box-shadow:0 1px 3px rgba(0,0,0,0.2); }
 .alarm-toggle input:checked + .alarm-slider { background:var(--blue); }
 .alarm-toggle input:checked + .alarm-slider::before { transform:translateX(18px); }
-.sched-color-swatch { width:28px;height:28px;border-radius:50%;cursor:pointer;transition:transform 0.15s;flex-shrink:0; }
+.fun-event-card { background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:8px;box-shadow:var(--shadow);overflow:hidden;cursor:pointer;transition:border-color 0.15s; }
+.fun-event-card:hover { border-color:var(--blue); }
+.fun-event-card.selected { border-color:var(--blue);box-shadow:0 0 0 2px var(--blue-light); }
+.fun-event-header { display:flex;align-items:center;justify-content:space-between;padding:10px 14px; }
+.fun-event-left { display:flex;align-items:center;gap:12px; }
+.fun-event-icon { font-size:22px;flex-shrink:0; }
+.fun-event-name { font-size:14px;font-weight:600;color:var(--text); }
+.fun-event-date { font-size:12px;color:var(--text-3);margin-top:1px; }
+.fun-event-participants { font-size:11px;padding:2px 8px;border-radius:99px;background:var(--blue-light);color:var(--blue-dark);font-weight:500;white-space:nowrap; }
+.bowling-grid-wrap { display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1rem; }
+.bowling-grid-title { font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px;display:flex;align-items:center;gap:6px; }
+.bowling-table { width:100%;border-collapse:collapse;font-size:12px; }
+.bowling-table th { padding:6px 8px;text-align:left;background:var(--bg);border-bottom:2px solid var(--border);font-size:10px;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-2); }
+.bowling-table td { padding:4px 6px;border-bottom:1px solid var(--border); }
+.bowling-table tr:last-child td { border-bottom:none; }
+.bowling-table .b-input { width:100%;font-size:12px;padding:3px 6px;border:1px solid transparent;border-radius:4px;background:transparent;color:var(--text);font-family:inherit;text-align:center; }
+.bowling-table .b-input:hover { border-color:var(--border);background:var(--surface); }
+.bowling-table .b-input:focus { outline:none;border-color:var(--blue);background:var(--surface); }
+.bowling-table .b-total { font-weight:700;color:var(--blue-dark);text-align:center; }
+@media(max-width:600px){.bowling-grid-wrap{grid-template-columns:1fr;}}
+height:28px;border-radius:50%;cursor:pointer;transition:transform 0.15s;flex-shrink:0; }
 .sched-color-swatch:hover { transform:scale(1.15); }
 .sched-color-swatch.active { transform:scale(1.15); }
 @media (max-width: 600px) { .syl-two-col { grid-template-columns:1fr; } }
@@ -335,6 +354,7 @@ select { font-size: 13px; padding: 7px 8px; border: 1px solid var(--border); bor
     <button class="nav-btn" onclick="switchTab('timer')">⏱ Timers</button>
     <button class="nav-btn" onclick="switchTab('calendar')">🗓 Dates</button>
     <button class="nav-btn" onclick="switchTab('agreements')">🤝 Agreements</button>
+    <button class="nav-btn" onclick="switchTab('funstuffs')">🎉 Fun Stuffs</button>
     <button class="nav-btn" onclick="switchTab('help')">🙋 Help</button>
   </nav>
 
@@ -1598,6 +1618,87 @@ select { font-size: 13px; padding: 7px 8px; border: 1px solid var(--border); bor
 
     </div>
 
+    <!-- FUN STUFFS TAB -->
+    <div id="tab-funstuffs" class="tab">
+
+      <!-- Header -->
+      <div style="text-align:center;padding:1.25rem 0 1rem;">
+        <div style="font-size:36px;margin-bottom:6px;">🎉</div>
+        <div style="font-size:20px;font-weight:700;color:var(--text);margin-bottom:4px;">Fun Stuffs</div>
+        <div style="font-size:13px;color:var(--text-2);">Friday rewards &amp; fun activities Caden earned this year!</div>
+      </div>
+
+      <!-- ===== EVENT LOG ===== -->
+      <div class="section-label">Activity Events</div>
+      <div class="card" style="margin-bottom:1.25rem;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+          <div style="font-size:13px;color:var(--text-2);">Tap an event to filter the tracker below.</div>
+          <button onclick="toggleFunForm()" id="fun-form-toggle-btn" class="btn-sm primary" style="font-size:12px;padding:5px 12px;">+ Add Event</button>
+        </div>
+
+        <!-- Add/Edit form -->
+        <div id="fun-form-wrap" style="display:none;margin-top:12px;border-top:1px solid var(--border);padding-top:12px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+            <div>
+              <div class="section-label" style="margin-bottom:4px;">Event Date</div>
+              <input type="date" id="fun-date" style="width:100%;font-size:13px;padding:0 8px;height:36px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);font-family:inherit;">
+            </div>
+            <div>
+              <div class="section-label" style="margin-bottom:4px;">Activity</div>
+              <select id="fun-activity" onchange="toggleFunCustomActivity()" style="width:100%;font-size:13px;padding:0 8px;height:36px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);font-family:inherit;">
+                <option value="Bowling">🎳 Bowling</option>
+                <option value="Pickleball">🏓 Pickleball</option>
+                <option value="Table Tennis">🏓 Table Tennis</option>
+                <option value="Mini Golf">⛳ Mini Golf</option>
+                <option value="Movie">🎬 Movie</option>
+                <option value="__custom__">✏️ Other (write in)…</option>
+              </select>
+            </div>
+          </div>
+          <div id="fun-custom-activity-wrap" style="display:none;margin-bottom:8px;">
+            <div class="section-label" style="margin-bottom:4px;">Activity Name</div>
+            <input id="fun-custom-activity" placeholder="e.g. Go-Karts, Laser Tag…" style="width:100%;font-size:13px;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);font-family:inherit;">
+          </div>
+          <div style="margin-bottom:12px;">
+            <div class="section-label" style="margin-bottom:6px;">Participants</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+              <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer;"><input type="checkbox" id="fun-p-caden" checked style="accent-color:var(--blue);"> Caden</label>
+              <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer;"><input type="checkbox" id="fun-p-mom" style="accent-color:var(--blue);"> Mom</label>
+              <label style="display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer;"><input type="checkbox" id="fun-p-dad" style="accent-color:var(--blue);"> Dad</label>
+              <input id="fun-p-custom" placeholder="Others (e.g. friends)…" style="flex:1;min-width:140px;font-size:13px;padding:5px 8px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);font-family:inherit;">
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn-sm primary" onclick="saveFunEvent()" style="flex:1;" id="fun-save-btn">Save Event</button>
+            <button class="btn-sm" onclick="cancelFunEdit()">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Event cards list -->
+      <div id="fun-event-list" style="margin-bottom:1.5rem;"></div>
+
+      <!-- ===== ACTIVITY TRACKER ===== -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <div class="section-label" style="margin-bottom:0;">Activity Tracker</div>
+        <select id="fun-tracker-activity" onchange="renderFunTracker()" style="font-size:13px;padding:0 8px;height:32px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);font-family:inherit;">
+          <option value="Bowling">🎳 Bowling</option>
+          <option value="Pickleball">🏓 Pickleball</option>
+          <option value="Table Tennis">🏓 Table Tennis</option>
+          <option value="Mini Golf">⛳ Mini Golf</option>
+          <option value="Movie">🎬 Movie</option>
+        </select>
+      </div>
+
+      <div id="fun-tracker-filter-badge" style="display:none;margin-bottom:10px;padding:6px 12px;background:var(--blue-light);border-radius:99px;font-size:12px;color:var(--blue-dark);align-items:center;gap:8px;">
+        <span id="fun-tracker-filter-label"></span>
+        <button onclick="clearFunFilter()" style="background:none;border:none;cursor:pointer;color:var(--blue-dark);font-size:14px;padding:0;line-height:1;">×</button>
+      </div>
+
+      <div id="fun-tracker-wrap"></div>
+
+    </div>
+
     <!-- HELP TAB (Caden's view) -->
     <div id="tab-help" class="tab">
       <div class="card" style="text-align:center;padding:2rem;">
@@ -1650,13 +1751,14 @@ const SUBJECTS = [
   {id:'ushistory',    name:'US History',            color:'#1E40AF', bg:'#DBEAFE', category:'core',      sessions:[{day:'Tue',time:'2pm',cr:2.5},{day:'Thu',time:'2pm',cr:2.5}]},
   {id:'personalfin',  name:'Personal Finance',      color:'#1E40AF', bg:'#DBEAFE', category:'core',      sessions:[{day:'Tue',time:'Noon',cr:2.5},{day:'Thu',time:'Noon',cr:2.5}]},
   {id:'commservices', name:'Comm Services',         color:'#5F5E5A', bg:'#F1EFE8', category:'noncore',   sessions:[{day:'Mon',time:'Flex',cr:2.5}]},
-  {id:'pe',           name:'PE',                    color:'#993C1D', bg:'#FAECE7', category:'noncore',   sessions:[{day:'Mon',time:'Flex2',cr:5.0}]},
+  {id:'pe',           name:'PE',                    color:'#993C1D', bg:'#FAECE7', category:'noncore',   sessions:[{day:'Mon',time:'3:30pm',cr:1.0},{day:'Tue',time:'3:30pm',cr:1.0},{day:'Wed',time:'3:30pm',cr:1.0},{day:'Thu',time:'3:30pm',cr:1.0},{day:'Fri',time:'3:30pm',cr:1.0}]},
   {id:'jrtransition', name:'Jr Transition Seminar', color:'#1E40AF', bg:'#DBEAFE', category:'noncore',   sessions:[{day:'Wed',time:'9am',cr:2.5}]},
   {id:'heartful',     name:'Heartful Life Mgmt',    color:'#1E40AF', bg:'#DBEAFE', category:'noncore',   sessions:[{day:'Wed',time:'10am',cr:2.5}]},
   {id:'dadtutorial',  name:'Dad Tutorial',          color:'#6B2D8B', bg:'#F3E8FF', category:'noncredit', sessions:[{day:'Tue',time:'9am',cr:0},{day:'Thu',time:'1pm',cr:0}]},
   {id:'momtutorial',  name:'Mom Tutorial',          color:'#6B2D8B', bg:'#F3E8FF', category:'noncredit', sessions:[{day:'Fri',time:'9am',cr:0},{day:'Wed',time:'1pm',cr:0}]},
   {id:'studyhr',      name:'Study/Reading',         color:'#2D6B4F', bg:'#E0F5EC', category:'noncredit', sessions:[{day:'Mon',time:'10am',cr:0},{day:'Tue',time:'10am',cr:0},{day:'Thu',time:'10am',cr:0},{day:'Fri',time:'10am',cr:0}]},
-  {id:'socialskills', name:'Social Skills',         color:'#8B5E0C', bg:'#FFF3DC', category:'noncredit', sessions:[{day:'Mon',time:'1pm',cr:0}]},
+  {id:'socialskills', name:'Social Skills',         color:'#8B5E0C', bg:'#FFF3DC', category:'noncredit', sessions:[{day:'Mon',time:'2:30pm',cr:0}]},
+  {id:'speechtherapy',name:'Speech Therapy',        color:'#444441', bg:'#F1EFE8', category:'noncredit', sessions:[{day:'Mon',time:'1:30pm',cr:0}]},
   {id:'',             name:'General',               color:'#888780', bg:'#F1EFE8', category:'noncredit', sessions:[]},
 ];
 
@@ -1690,7 +1792,29 @@ const TYPE_STYLES = {
 
 function buildDefaultSchedule() {
   const s = {};
-  SUBJECTS.forEach(sub => sub.sessions.forEach(sess => { s[sess.day+'|'+sess.time] = sub.id; }));
+  // End time map for sessions that need it (key: "day|time" -> end time value)
+  const endTimes = {
+    // Core classes — 1 hour each
+    'Mon|9am':'10:00','Thu|9am':'10:00',
+    'Mon|Noon':'13:00','Wed|Noon':'13:00',
+    'Tue|2pm':'15:00','Thu|2pm':'15:00',
+    'Tue|Noon':'13:00','Thu|Noon':'13:00',
+    'Wed|9am':'10:00',
+    'Wed|10am':'11:00',
+    // Non-credit sessions
+    'Tue|9am':'10:00','Thu|1pm':'14:00',
+    'Fri|9am':'10:00','Wed|1pm':'14:00',
+    'Mon|10am':'11:00','Tue|10am':'11:00','Thu|10am':'11:00','Fri|10am':'11:00',
+    'Mon|2:30pm':'15:00',
+    'Mon|1:30pm':'14:00',
+    // PE — 3:30 to 4pm every day
+    'Mon|3:30pm':'16:00','Tue|3:30pm':'16:00','Wed|3:30pm':'16:00','Thu|3:30pm':'16:00','Fri|3:30pm':'16:00',
+  };
+  SUBJECTS.forEach(sub => sub.sessions.forEach(sess => {
+    const key = sess.day+'|'+sess.time;
+    s[key] = sub.id;
+    if(endTimes[key]) s[key+'|end'] = endTimes[key];
+  }));
   return s;
 }
 
@@ -1710,6 +1834,7 @@ function setSyncStatus(status) {
 
 async function saveState() {
   setSyncStatus('saving');
+  lastSaveTime = Date.now();
   clearTimeout(saveTimer);
   saveTimer = setTimeout(async () => {
     try {
@@ -1719,19 +1844,25 @@ async function saveState() {
   }, 800);
 }
 
-const SCHEDULE_VERSION = 11; // increment this to force-reset the schedule
+const SCHEDULE_VERSION = 12; // increment this to force-reset the schedule
 
 // Real-time listener
+let lastSaveTime = 0;
+
 onSnapshot(STATE_DOC, (snap) => {
+  // Skip remote update if we just saved locally (within 3 seconds)
+  // This prevents our own save from triggering a reset
+  if(Date.now() - lastSaveTime < 3000) return;
+
   if (snap.exists()) {
     const remote = snap.data();
-    state = remote;
-    // Force reset schedule if version is outdated or missing
-    if (!state.schedule || !state.scheduleVersion || state.scheduleVersion < SCHEDULE_VERSION) {
-      state.schedule = buildDefaultSchedule();
-      state.scheduleVersion = SCHEDULE_VERSION;
-      setDoc(STATE_DOC, state); // push corrected schedule to Firebase
+    // Reset schedule if missing or version outdated
+    if (!remote.schedule || !remote.scheduleVersion || remote.scheduleVersion < SCHEDULE_VERSION) {
+      remote.schedule = buildDefaultSchedule();
+      remote.scheduleVersion = SCHEDULE_VERSION;
+      setDoc(STATE_DOC, remote);
     }
+    state = remote;
     if (!state.customEvents) state.customEvents = [];
     if (!state.todos) state.todos = [];
     if (!state.timerLog) state.timerLog = [];
@@ -1824,7 +1955,6 @@ function subjectCardHTML(s) {
         <span class="chevron" id="chev-${sid}">›</span>
       </div>
     </div>
-    <div class="prog-bar"><div class="prog-fill" style="width:${pct}%;background:${s.color}"></div></div>
     <div class="subject-body" id="body-${sid}">
       <div style="padding-top:10px;">
         ${open.length ? open.map(taskRow).join('') : '<div style="font-size:13px;color:var(--text-3);padding:6px 0;">No open tasks</div>'}
@@ -2243,10 +2373,11 @@ window.switchTab = function(name) {
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('tab-'+name).classList.add('active');
-  const tabs=['courses','notes','tracker','schedule','syllabus','timer','calendar','agreements','help'];
+  const tabs=['courses','notes','tracker','schedule','syllabus','timer','calendar','agreements','funstuffs','help'];
   document.querySelectorAll('.nav-btn')[tabs.indexOf(name)].classList.add('active');
   if(name==='timer') startClock();
   if(name==='notes') initNotesTab();
+  if(name==='funstuffs') { renderFunEvents(); renderFunTracker(); }
 };
 
 // =================== CLASS NOTES ===================
@@ -2257,7 +2388,7 @@ const NOTE_SUBJECT_NAMES = {
   personalfin:'Personal Finance', commservices:'Comm Services', pe:'PE',
   jrtransition:'Jr Transition Seminar', heartful:'Heartful Life Mgmt',
   dadtutorial:'Dad Tutorial', momtutorial:'Mom Tutorial',
-  studyhr:'Study/Reading', socialskills:'Social Skills', '':'General',
+  studyhr:'Study/Reading', socialskills:'Social Skills', speechtherapy:'Speech Therapy', '':'General',
 };
 
 const AUTHOR_COLORS = {
@@ -3799,6 +3930,261 @@ window.clearHelp = function(){
 renderPomDots();
 renderTimerLog();
 startClock();
+
+// =================== FUN STUFFS ===================
+const FUN_ACTIVITIES = ['Bowling','Pickleball','Table Tennis','Mini Golf','Movie'];
+const FUN_ICONS = {Bowling:'🎳',Pickleball:'🏓','Table Tennis':'🏓','Mini Golf':'⛳',Movie:'🎬'};
+
+let funEditingId = null;
+let funFilterEventId = null;
+
+window.toggleFunForm = function() {
+  const wrap = document.getElementById('fun-form-wrap');
+  const btn = document.getElementById('fun-form-toggle-btn');
+  const isOpen = wrap.style.display !== 'none';
+  if(isOpen) { cancelFunEdit(); return; }
+  funEditingId = null;
+  document.getElementById('fun-save-btn').textContent = 'Save Event';
+  document.getElementById('fun-date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('fun-activity').value = 'Bowling';
+  document.getElementById('fun-custom-activity-wrap').style.display = 'none';
+  document.getElementById('fun-p-caden').checked = true;
+  document.getElementById('fun-p-mom').checked = false;
+  document.getElementById('fun-p-dad').checked = false;
+  document.getElementById('fun-p-custom').value = '';
+  wrap.style.display = 'block';
+  btn.textContent = '✕ Close';
+};
+
+window.cancelFunEdit = function() {
+  funEditingId = null;
+  document.getElementById('fun-form-wrap').style.display = 'none';
+  document.getElementById('fun-form-toggle-btn').textContent = '+ Add Event';
+};
+
+window.toggleFunCustomActivity = function() {
+  const val = document.getElementById('fun-activity').value;
+  document.getElementById('fun-custom-activity-wrap').style.display = val === '__custom__' ? 'block' : 'none';
+};
+
+window.editFunEvent = function(id) {
+  const e = (state.funEvents||[]).find(e=>e.id===id);
+  if(!e) return;
+  funEditingId = id;
+  document.getElementById('fun-date').value = e.date||'';
+  if(FUN_ACTIVITIES.includes(e.activity)) {
+    document.getElementById('fun-activity').value = e.activity;
+    document.getElementById('fun-custom-activity-wrap').style.display = 'none';
+  } else {
+    document.getElementById('fun-activity').value = '__custom__';
+    document.getElementById('fun-custom-activity-wrap').style.display = 'block';
+    document.getElementById('fun-custom-activity').value = e.activity||'';
+  }
+  document.getElementById('fun-p-caden').checked = e.participants?.includes('Caden');
+  document.getElementById('fun-p-mom').checked = e.participants?.includes('Mom');
+  document.getElementById('fun-p-dad').checked = e.participants?.includes('Dad');
+  document.getElementById('fun-p-custom').value = e.customParticipants||'';
+  document.getElementById('fun-save-btn').textContent = 'Update Event';
+  document.getElementById('fun-form-wrap').style.display = 'block';
+  document.getElementById('fun-form-toggle-btn').textContent = '✕ Close';
+  document.getElementById('fun-form-wrap').scrollIntoView({behavior:'smooth',block:'center'});
+};
+
+window.saveFunEvent = function() {
+  const date = document.getElementById('fun-date').value;
+  const actSel = document.getElementById('fun-activity').value;
+  const activity = actSel === '__custom__' ? document.getElementById('fun-custom-activity').value.trim() : actSel;
+  if(!date || !activity) { alert('Please fill in date and activity.'); return; }
+  const participants = [];
+  if(document.getElementById('fun-p-caden').checked) participants.push('Caden');
+  if(document.getElementById('fun-p-mom').checked) participants.push('Mom');
+  if(document.getElementById('fun-p-dad').checked) participants.push('Dad');
+  const customP = document.getElementById('fun-p-custom').value.trim();
+  if(!state.funEvents) state.funEvents = [];
+  if(funEditingId) {
+    const e = state.funEvents.find(e=>e.id===funEditingId);
+    if(e) { e.date=date; e.activity=activity; e.participants=participants; e.customParticipants=customP; }
+    funEditingId = null;
+  } else {
+    state.funEvents.unshift({id:Date.now()+'', date, activity, participants, customParticipants:customP});
+  }
+  cancelFunEdit();
+  renderFunEvents();
+  saveState();
+};
+
+window.deleteFunEvent = function(id) {
+  if(!confirm('Delete this event?')) return;
+  state.funEvents = (state.funEvents||[]).filter(e=>e.id!==id);
+  if(funFilterEventId===id) { funFilterEventId=null; clearFunFilter(); }
+  renderFunEvents(); saveState();
+};
+
+window.selectFunEvent = function(id) {
+  const e = (state.funEvents||[]).find(e=>e.id===id);
+  if(!e) return;
+  if(funFilterEventId===id) { clearFunFilter(); return; }
+  funFilterEventId = id;
+  // Switch tracker activity to match event
+  const sel = document.getElementById('fun-tracker-activity');
+  if(FUN_ACTIVITIES.includes(e.activity)) sel.value = e.activity;
+  // Show filter badge
+  const badge = document.getElementById('fun-tracker-filter-badge');
+  badge.style.display = 'inline-flex';
+  document.getElementById('fun-tracker-filter-label').textContent =
+    `Showing: ${e.activity} on ${new Date(e.date+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}`;
+  renderFunEvents();
+  renderFunTracker();
+  document.getElementById('fun-tracker-wrap').scrollIntoView({behavior:'smooth',block:'start'});
+};
+
+window.clearFunFilter = function() {
+  funFilterEventId = null;
+  document.getElementById('fun-tracker-filter-badge').style.display = 'none';
+  renderFunEvents();
+  renderFunTracker();
+};
+
+function renderFunEvents() {
+  const el = document.getElementById('fun-event-list');
+  const events = (state.funEvents||[]).slice().sort((a,b)=>b.date.localeCompare(a.date));
+  if(!events.length) {
+    el.innerHTML = `<div class="card" style="text-align:center;padding:2rem;color:var(--text-3);">
+      <div style="font-size:28px;margin-bottom:8px;">🎉</div>
+      <div style="font-weight:500;margin-bottom:4px;">No fun activities yet</div>
+      <div style="font-size:13px;">Click "+ Add Event" to log Caden's first reward activity!</div>
+    </div>`;
+    return;
+  }
+  el.innerHTML = events.map(e => {
+    const icon = FUN_ICONS[e.activity]||'🎯';
+    const dateStr = new Date(e.date+'T12:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+    const allP = [...(e.participants||[]), ...(e.customParticipants?[e.customParticipants]:[])].join(', ');
+    const isSelected = funFilterEventId === e.id;
+    return `<div class="fun-event-card ${isSelected?'selected':''}" onclick="selectFunEvent('${e.id}')">
+      <div class="fun-event-header">
+        <div class="fun-event-left">
+          <div class="fun-event-icon">${icon}</div>
+          <div>
+            <div class="fun-event-name">${e.activity}</div>
+            <div class="fun-event-date">${dateStr}</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          ${allP ? `<span class="fun-event-participants">👥 ${allP}</span>` : ''}
+          <button class="agr-edit-btn" onclick="event.stopPropagation();editFunEvent('${e.id}')" title="Edit">✏️</button>
+          <button class="del-btn" onclick="event.stopPropagation();deleteFunEvent('${e.id}')" title="Delete">×</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ---- BOWLING TRACKER ----
+window.renderFunTracker = function() {
+  const activity = document.getElementById('fun-tracker-activity').value;
+  const wrap = document.getElementById('fun-tracker-wrap');
+  if(activity === 'Bowling') renderBowlingTracker(wrap);
+  else {
+    wrap.innerHTML = `<div class="card" style="text-align:center;padding:2rem;color:var(--text-3);">
+      <div style="font-size:28px;margin-bottom:8px;">${FUN_ICONS[activity]||'🎯'}</div>
+      <div style="font-weight:500;margin-bottom:4px;">${activity} tracker coming soon</div>
+      <div style="font-size:13px;">You mentioned you'll provide specs for this activity later!</div>
+    </div>`;
+  }
+};
+
+function renderBowlingTracker(wrap) {
+  if(!state.bowlingGames||Array.isArray(state.bowlingGames)) state.bowlingGames = {};
+  const filterEvent = funFilterEventId ? (state.funEvents||[]).find(e=>e.id===funFilterEventId) : null;
+  const filterDate = filterEvent ? filterEvent.date : null;
+  const players = ['Caden','Dad'];
+
+  const playerTables = players.map(player => {
+    if(!state.bowlingGames[player]) state.bowlingGames[player] = [];
+    const allGames = state.bowlingGames[player];
+    const games = filterDate ? allGames.filter(g=>g.date===filterDate) : allGames;
+    const high = games.length ? Math.max(...games.map(g=>parseInt(g.score)||0)) : null;
+    const rows = games.map(g => `<tr>
+      <td><input type="date" class="b-input" value="${g.date||''}" style="width:120px;text-align:left;"
+        onchange="saveBowlingField('${player}','${g.id}','date',this.value)"></td>
+      <td><input class="b-input" type="number" min="0" max="10" value="${g.spares||''}" placeholder="—"
+        onchange="saveBowlingField('${player}','${g.id}','spares',this.value)"></td>
+      <td><input class="b-input" type="number" min="0" max="12" value="${g.strikes||''}" placeholder="—"
+        onchange="saveBowlingField('${player}','${g.id}','strikes',this.value)"></td>
+      <td><input class="b-input" type="number" min="0" max="300" value="${g.score||''}" placeholder="—"
+        onchange="saveBowlingField('${player}','${g.id}','score',this.value)"></td>
+      <td><button class="del-btn" onclick="deleteBowlingGame('${player}','${g.id}')">×</button></td>
+    </tr>`).join('');
+    const avgRow = games.length > 1 ? `<tfoot><tr style="background:var(--bg);">
+      <td style="font-size:11px;font-weight:600;padding:6px 8px;">Avg</td>
+      <td class="b-total">${avg(games.map(g=>g.spares))}</td>
+      <td class="b-total">${avg(games.map(g=>g.strikes))}</td>
+      <td class="b-total">${avg(games.map(g=>g.score))}</td>
+      <td></td>
+    </tr></tfoot>` : '';
+    return `<div>
+      <div class="bowling-grid-title">
+        🎳 ${player}'s Games
+        ${high!==null&&games.length?`<span style="font-size:11px;padding:2px 8px;border-radius:99px;background:var(--blue-light);color:var(--blue-dark);font-weight:600;">Best: ${high}</span>`:''}
+        <button onclick="addBowlingGame('${player}')" class="btn-sm primary" style="margin-left:auto;font-size:11px;padding:4px 10px;">+ Add Game</button>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        ${!games.length ? `<div style="padding:1.5rem;text-align:center;font-size:13px;color:var(--text-3);">No games yet — click "+ Add Game".</div>` : `
+        <table class="bowling-table">
+          <thead><tr>
+            <th>Date</th>
+            <th style="text-align:center;">Spares</th>
+            <th style="text-align:center;">Strikes</th>
+            <th style="text-align:center;">Score</th>
+            <th style="width:28px;"></th>
+          </tr></thead>
+          <tbody>${rows}</tbody>
+          ${avgRow}
+        </table>`}
+      </div>
+    </div>`;
+  }).join('');
+
+  wrap.innerHTML = `<div class="bowling-grid-wrap">${playerTables}</div>`;
+}
+
+function avg(vals) {
+  const nums = (vals||[]).map(Number).filter(v=>!isNaN(v)&&String(v)!=='');
+  if(!nums.length) return '—';
+  return (nums.reduce((a,b)=>a+b,0)/nums.length).toFixed(1);
+}
+
+window.addBowlingGame = function(player) {
+  if(!state.bowlingGames||Array.isArray(state.bowlingGames)) state.bowlingGames = {};
+  if(!state.bowlingGames[player]) state.bowlingGames[player] = [];
+  const filterEvent = funFilterEventId ? (state.funEvents||[]).find(e=>e.id===funFilterEventId) : null;
+  const date = filterEvent ? filterEvent.date : new Date().toISOString().split('T')[0];
+  state.bowlingGames[player].unshift({id:Date.now()+'', date, spares:'', strikes:'', score:''});
+  renderFunTracker(); saveState();
+};
+
+window.saveBowlingField = function(player, gameId, field, value) {
+  const g = (state.bowlingGames?.[player]||[]).find(g=>g.id===gameId);
+  if(!g) return;
+  g[field] = value;
+  if(field==='score') renderFunTracker();
+  saveState();
+};
+
+window.deleteBowlingGame = function(player, id) {
+  if(!confirm('Delete this game?')) return;
+  if(state.bowlingGames?.[player])
+    state.bowlingGames[player] = state.bowlingGames[player].filter(g=>g.id!==id);
+  renderFunTracker(); saveState();
+};
+
+
+function renderAll_funstuffs() {
+  renderFunEvents();
+  renderFunTracker();
+}
+// =================== END FUN STUFFS ===================
 </script>
 </body>
 </html>
