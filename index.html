@@ -4170,6 +4170,7 @@ window.renderFunTracker = function() {
   const activity = document.getElementById('fun-tracker-activity').value;
   const wrap = document.getElementById('fun-tracker-wrap');
   if(activity === 'Bowling') renderBowlingTracker(wrap);
+  else if(activity === 'Table Tennis') renderTableTennisTracker(wrap);
   else {
     wrap.innerHTML = `<div class="card" style="text-align:center;padding:2rem;color:var(--text-3);">
       <div style="font-size:28px;margin-bottom:8px;">${FUN_ICONS[activity]||'🎯'}</div>
@@ -4269,7 +4270,101 @@ function renderAll_funstuffs() {
   renderFunEvents();
   renderFunTracker();
 }
-// =================== END FUN STUFFS ===================
+// ---- TABLE TENNIS TRACKER ----
+function renderTableTennisTracker(wrap) {
+  if(!state.ttGames) state.ttGames = {};
+  const filterEvent = funFilterEventId ? (state.funEvents||[]).find(e=>e.id===funFilterEventId) : null;
+  const filterDate = filterEvent ? filterEvent.date : null;
+  const players = ["Caden"];
+
+  const playerTables = players.map(player => {
+    if(!state.ttGames[player]) state.ttGames[player] = [];
+    const allGames = state.ttGames[player];
+    const games = filterDate ? allGames.filter(g=>g.date===filterDate) : allGames;
+    const wins = games.reduce((sum,g)=>sum+(parseInt(g.win)||0),0);
+    const losses = games.reduce((sum,g)=>sum+(parseInt(g.loss)||0),0);
+
+    const rows = games.map(g => `<tr>
+      <td><input type="date" class="b-input" value="${g.date||''}" style="width:120px;text-align:left;"
+        onchange="saveTTField('${player}','${g.id}','date',this.value)"></td>
+      <td><input class="b-input" type="number" min="0" max="3000" value="${g.begRating||''}" placeholder="—"
+        onchange="saveTTField('${player}','${g.id}','begRating',this.value)"></td>
+      <td><input class="b-input" type="number" min="0" max="99" value="${g.win||''}" placeholder="—"
+        onchange="saveTTField('${player}','${g.id}','win',this.value)"></td>
+      <td><input class="b-input" type="number" min="0" max="99" value="${g.loss||''}" placeholder="—"
+        onchange="saveTTField('${player}','${g.id}','loss',this.value)"></td>
+      <td><input class="b-input" type="number" min="0" max="3000" value="${g.endRating||''}" placeholder="—"
+        onchange="saveTTField('${player}','${g.id}','endRating',this.value)"></td>
+      <td><input class="b-input" type="text" value="${g.comment||''}" placeholder="Notes…"
+        style="min-width:100px;text-align:left;"
+        onchange="saveTTField('${player}','${g.id}','comment',this.value)"></td>
+      <td><button class="del-btn" onclick="deleteTTGame('${player}','${g.id}')">×</button></td>
+    </tr>`).join('');
+
+    const totalsRow = games.length ? `<tfoot><tr style="background:var(--bg);">
+      <td style="font-size:11px;font-weight:600;padding:6px 8px;">Total</td>
+      <td class="b-total">—</td>
+      <td class="b-total" style="color:#27500A;">${wins}</td>
+      <td class="b-total" style="color:#A32D2D;">${losses}</td>
+      <td class="b-total">—</td>
+      <td></td><td></td>
+    </tr></tfoot>` : '';
+
+    const winRate = (wins+losses) > 0 ? Math.round(wins/(wins+losses)*100) : null;
+
+    return `<div style="margin-bottom:1.25rem;">
+      <div class="bowling-grid-title">
+        🏓 ${player}'s Sessions
+        ${winRate!==null ? `<span style="font-size:11px;padding:2px 8px;border-radius:99px;background:var(--green-light);color:#27500A;font-weight:600;">Win rate: ${winRate}%</span>` : ''}
+        <button onclick="addTTGame('${player}')" class="btn-sm primary" style="margin-left:auto;font-size:11px;padding:4px 10px;">+ Add Session</button>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        ${!games.length ? `<div style="padding:1.5rem;text-align:center;font-size:13px;color:var(--text-3);">No sessions yet — click "+ Add Session".</div>` : `
+        <div style="overflow-x:auto;">
+        <table class="bowling-table" style="min-width:520px;">
+          <thead><tr>
+            <th>Date</th>
+            <th style="text-align:center;">Beg Rating</th>
+            <th style="text-align:center;">Win</th>
+            <th style="text-align:center;">Loss</th>
+            <th style="text-align:center;">End Rating</th>
+            <th>Comment</th>
+            <th style="width:28px;"></th>
+          </tr></thead>
+          <tbody>${rows}</tbody>
+          ${totalsRow}
+        </table></div>`}
+      </div>
+    </div>`;
+  }).join('');
+
+  wrap.innerHTML = playerTables;
+}
+
+window.addTTGame = function(player) {
+  if(!state.ttGames) state.ttGames = {};
+  if(!state.ttGames[player]) state.ttGames[player] = [];
+  const filterEvent = funFilterEventId ? (state.funEvents||[]).find(e=>e.id===funFilterEventId) : null;
+  const date = filterEvent ? filterEvent.date : new Date().toISOString().split('T')[0];
+  state.ttGames[player].unshift({id:Date.now()+'', date, begRating:'', win:'', loss:'', endRating:'', comment:''});
+  renderFunTracker(); saveState();
+};
+
+window.saveTTField = function(player, gameId, field, value) {
+  const g = (state.ttGames?.[player]||[]).find(g=>g.id===gameId);
+  if(!g) return;
+  g[field] = value;
+  if(['win','loss','endRating'].includes(field)) renderFunTracker();
+  saveState();
+};
+
+window.deleteTTGame = function(player, id) {
+  if(!confirm('Delete this session?')) return;
+  if(state.ttGames?.[player])
+    state.ttGames[player] = state.ttGames[player].filter(g=>g.id!==id);
+  renderFunTracker(); saveState();
+};
+// ---- END TABLE TENNIS TRACKER ----
 </script>
 </body>
 </html>
