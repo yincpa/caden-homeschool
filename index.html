@@ -1850,29 +1850,114 @@ const SCHEDULE_VERSION = 12; // increment this to force-reset the schedule
 let lastSaveTime = 0;
 
 onSnapshot(STATE_DOC, (snap) => {
-  // Skip remote update if we just saved locally (within 3 seconds)
-  // This prevents our own save from triggering a reset
-  if(Date.now() - lastSaveTime < 3000) return;
+  // Skip remote update if we just saved locally (within 5 seconds)
+  if(Date.now() - lastSaveTime < 5000) return;
 
   if (snap.exists()) {
     const remote = snap.data();
-    // Reset schedule if missing or version outdated
-    if (!remote.schedule || !remote.scheduleVersion || remote.scheduleVersion < SCHEDULE_VERSION) {
-      remote.schedule = buildDefaultSchedule();
-      remote.scheduleVersion = SCHEDULE_VERSION;
-      setDoc(STATE_DOC, remote);
+    if (!remote.schedule) remote.schedule = buildDefaultSchedule();
+    if (!remote.customEvents) remote.customEvents = [];
+    if (!remote.todos) remote.todos = [];
+    if (!remote.timerLog) remote.timerLog = [];
+    // Restore recovered World History assignment if whAssignments is missing
+    if (!remote.whAssignments || remote.whAssignments.length === 0) {
+      remote.whAssignments = getRecoveredWHAssignments();
+    }
+    if (!remote.generalInfo || !remote.generalInfo.main) {
+      remote.generalInfo = getRecoveredGeneralInfo();
+    }
+    if (!remote.funEvents || remote.funEvents.length === 0) {
+      remote.funEvents = getRecoveredFunEvents();
     }
     state = remote;
-    if (!state.customEvents) state.customEvents = [];
-    if (!state.todos) state.todos = [];
-    if (!state.timerLog) state.timerLog = [];
   } else {
     state.schedule = buildDefaultSchedule();
     state.scheduleVersion = SCHEDULE_VERSION;
+    state.whAssignments = getRecoveredWHAssignments();
   }
   renderAll();
   setSyncStatus('synced');
 }, (err) => { setSyncStatus('error'); });
+
+function getRecoveredWHAssignments() {
+  return [{
+    id: '1724112000000',
+    title: 'Chapter 14 — Early Modern Times',
+    assigned: '2026-08-17',
+    due: '2026-08-20',
+    questions: [
+      {
+        q: 'Tell me a few things about Williams Shakespeare, and list out a few of his famous plays.',
+        answer: "William Shakespeare is known for his famous plays that he created. He made 39 plays, one was about two teenagers characters named Romeo and Juliet. It was about Romeo and Juliet warning families who fall in love. Macbeth, the main characters is to ambitious. Hamlet is a story of a prince who seeks revenge to his fathers murder. Many of Shakespear's plays were first produced in Landon's Globe Theatre. Stratfard-upon-Avon, his birthplace, has hosted such an event since 1769."
+      },
+      {
+        q: 'Tell me a few other writers/painters/inventors from the Renaissance period. (Read pls 341 to 344).',
+        answer: "There's a painter named Donatello who is a sculptor. A man named Leonardo da Vinci is known for being an artist who created his most famous painting in 1503. Another sculptor named Michelangelo is famous for carving the Pieta, which means \"Pity.\" (pg 342 bottom) The painting of Mary and the baby Jesus were remembered because his paintings were mostly religious during the Renaissance. (pg 344)"
+      },
+      {
+        q: 'Browse thru Lesson 4 & 5 (p338 to 347) and write down key words from these pages.',
+        answer: 'Some key words that I found are Drama, sonnet, portrait, fresco, patron, chapel, and Vatican. (pg 341 bottom)'
+      }
+    ],
+    created: '2026-08-17T00:00:00.000Z'
+  }];
+}
+
+function getRecoveredGeneralInfo() {
+  return {
+    main: `STUDENT INFORMATION
+Caden's Student ID: 114816
+Google Account: Cyin114816@iemschools.org
+
+SCHOOL CONTACTS & KEY PEOPLE
+
+Donnette Hegler (ES / Education Specialist)
+Phone: 669-286-9673
+Email: dheger@ieminc.org
+
+Janelle Rhoads (Advisor)
+Email: jrhoads@ieminc.org
+
+Angela Underwood (Special Education Teacher — Eng 11 A/B)
+Email: aunderwood@ieminc.org
+Phone: (530) 442-4853
+Schedule: Mon & Wed, Noon to 1pm
+Class Zoom: https://us02web.zoom.us/j/87120786792
+Office Hours: Mon & Wed 2:15–2:45pm (text before attending)
+Office Hours Zoom: https://us02web.zoom.us/j/81154360221
+
+Ayanna Williams, M.Ed. (Transition Specialist / Special Ed Teacher — Jr Transition Seminar)
+Email: awilliams@ieminc.org
+Phone: (530) 442-8452
+Schedule: Wed 9am
+Class Zoom: https://us02web.zoom.us/j/82190639184
+
+Elizabeth Trevino (Heartful Life Management — sub for Claire Priddy on leave)
+Email: etrevino@ieminc.org
+Phone: 760-248-8821
+Class Zoom (10am): https://us02web.zoom.us/j/85289596441#success
+
+Alyssa Berkowitz (Speech Therapist)
+Email: berkowitz.alyssa@gmail.com
+Zoom: https://us06web.zoom.us/j/4502557368?pwd=RFdYOEJIeXJYUXF1dnJIaEx2bVhmUT09
+
+IMPORTANT DATES
+Annual IEP Meeting: Friday, October 23, 2026 at 12:30pm
+IEP Zoom: https://us02web.zoom.us/j/85319768036
+
+Donnette's Personal Zoom: https://us02web.zoom.us/j/4091571580`
+  };
+}
+
+function getRecoveredFunEvents() {
+  return [{
+    id: '1724198400000',
+    date: '2026-08-21',
+    activity: 'Bowling',
+    participants: ['Caden', 'Mom', 'Dad'],
+    customParticipants: ''
+  }];
+}
 
 function renderAll() {
   renderStats(); renderSubjects(); renderSchedule(); renderCredits();
