@@ -1632,7 +1632,7 @@ height:28px;border-radius:50%;cursor:pointer;transition:transform 0.15s;flex-shr
       <div class="section-label">Activity Events</div>
       <div class="card" style="margin-bottom:1.25rem;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
-          <div style="font-size:13px;color:var(--text-2);">Tap an event to filter the tracker below.</div>
+          <div style="font-size:13px;color:var(--text-2);">Log fun activities Caden earned as Friday rewards.</div>
           <button onclick="toggleFunForm()" id="fun-form-toggle-btn" class="btn-sm primary" style="font-size:12px;padding:5px 12px;">+ Add Event</button>
         </div>
 
@@ -1688,11 +1688,6 @@ height:28px;border-radius:50%;cursor:pointer;transition:transform 0.15s;flex-shr
           <option value="Mini Golf">⛳ Mini Golf</option>
           <option value="Movie">🎬 Movie</option>
         </select>
-      </div>
-
-      <div id="fun-tracker-filter-badge" style="display:none;margin-bottom:10px;padding:6px 12px;background:var(--blue-light);border-radius:99px;font-size:12px;color:var(--blue-dark);align-items:center;gap:8px;">
-        <span id="fun-tracker-filter-label"></span>
-        <button onclick="clearFunFilter()" style="background:none;border:none;cursor:pointer;color:var(--blue-dark);font-size:14px;padding:0;line-height:1;">×</button>
       </div>
 
       <div id="fun-tracker-wrap"></div>
@@ -4021,7 +4016,7 @@ const FUN_ACTIVITIES = ['Bowling','Pickleball','Table Tennis','Mini Golf','Movie
 const FUN_ICONS = {Bowling:'🎳',Pickleball:'🏓','Table Tennis':'🏓','Mini Golf':'⛳',Movie:'🎬'};
 
 let funEditingId = null;
-let funFilterEventId = null;
+
 
 window.toggleFunForm = function() {
   const wrap = document.getElementById('fun-form-wrap');
@@ -4101,33 +4096,7 @@ window.saveFunEvent = function() {
 window.deleteFunEvent = function(id) {
   if(!confirm('Delete this event?')) return;
   state.funEvents = (state.funEvents||[]).filter(e=>e.id!==id);
-  if(funFilterEventId===id) { funFilterEventId=null; clearFunFilter(); }
   renderFunEvents(); saveState();
-};
-
-window.selectFunEvent = function(id) {
-  const e = (state.funEvents||[]).find(e=>e.id===id);
-  if(!e) return;
-  if(funFilterEventId===id) { clearFunFilter(); return; }
-  funFilterEventId = id;
-  // Switch tracker activity to match event
-  const sel = document.getElementById('fun-tracker-activity');
-  if(FUN_ACTIVITIES.includes(e.activity)) sel.value = e.activity;
-  // Show filter badge
-  const badge = document.getElementById('fun-tracker-filter-badge');
-  badge.style.display = 'inline-flex';
-  document.getElementById('fun-tracker-filter-label').textContent =
-    `Showing: ${e.activity} on ${new Date(e.date+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}`;
-  renderFunEvents();
-  renderFunTracker();
-  document.getElementById('fun-tracker-wrap').scrollIntoView({behavior:'smooth',block:'start'});
-};
-
-window.clearFunFilter = function() {
-  funFilterEventId = null;
-  document.getElementById('fun-tracker-filter-badge').style.display = 'none';
-  renderFunEvents();
-  renderFunTracker();
 };
 
 function renderFunEvents() {
@@ -4145,8 +4114,8 @@ function renderFunEvents() {
     const icon = FUN_ICONS[e.activity]||'🎯';
     const dateStr = new Date(e.date+'T12:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
     const allP = [...(e.participants||[]), ...(e.customParticipants?[e.customParticipants]:[])].join(', ');
-    const isSelected = funFilterEventId === e.id;
-    return `<div class="fun-event-card ${isSelected?'selected':''}" onclick="selectFunEvent('${e.id}')">
+
+    return `<div class="fun-event-card">
       <div class="fun-event-header">
         <div class="fun-event-left">
           <div class="fun-event-icon">${icon}</div>
@@ -4182,14 +4151,12 @@ window.renderFunTracker = function() {
 
 function renderBowlingTracker(wrap) {
   if(!state.bowlingGames||Array.isArray(state.bowlingGames)) state.bowlingGames = {};
-  const filterEvent = funFilterEventId ? (state.funEvents||[]).find(e=>e.id===funFilterEventId) : null;
-  const filterDate = filterEvent ? filterEvent.date : null;
   const players = ['Caden','Dad'];
 
   const playerTables = players.map(player => {
     if(!state.bowlingGames[player]) state.bowlingGames[player] = [];
     const allGames = state.bowlingGames[player];
-    const games = filterDate ? allGames.filter(g=>g.date===filterDate) : allGames;
+    const games = allGames;
     const high = games.length ? Math.max(...games.map(g=>parseInt(g.score)||0)) : null;
     const rows = games.map(g => `<tr>
       <td><input type="date" class="b-input" value="${g.date||''}" style="width:120px;text-align:left;"
@@ -4244,8 +4211,8 @@ function avg(vals) {
 window.addBowlingGame = function(player) {
   if(!state.bowlingGames||Array.isArray(state.bowlingGames)) state.bowlingGames = {};
   if(!state.bowlingGames[player]) state.bowlingGames[player] = [];
-  const filterEvent = funFilterEventId ? (state.funEvents||[]).find(e=>e.id===funFilterEventId) : null;
-  const date = filterEvent ? filterEvent.date : new Date().toISOString().split('T')[0];
+
+  const date = new Date().toISOString().split("T")[0];
   state.bowlingGames[player].unshift({id:Date.now()+'', date, spares:'', strikes:'', score:''});
   renderFunTracker(); saveState();
 };
@@ -4273,14 +4240,14 @@ function renderAll_funstuffs() {
 // ---- TABLE TENNIS TRACKER ----
 function renderTableTennisTracker(wrap) {
   if(!state.ttGames) state.ttGames = {};
-  const filterEvent = funFilterEventId ? (state.funEvents||[]).find(e=>e.id===funFilterEventId) : null;
-  const filterDate = filterEvent ? filterEvent.date : null;
+
+  // no filter
   const players = ["Caden"];
 
   const playerTables = players.map(player => {
     if(!state.ttGames[player]) state.ttGames[player] = [];
     const allGames = state.ttGames[player];
-    const games = filterDate ? allGames.filter(g=>g.date===filterDate) : allGames;
+    const games = allGames;
     const wins = games.reduce((sum,g)=>sum+(parseInt(g.win)||0),0);
     const losses = games.reduce((sum,g)=>sum+(parseInt(g.loss)||0),0);
 
@@ -4344,8 +4311,8 @@ function renderTableTennisTracker(wrap) {
 window.addTTGame = function(player) {
   if(!state.ttGames) state.ttGames = {};
   if(!state.ttGames[player]) state.ttGames[player] = [];
-  const filterEvent = funFilterEventId ? (state.funEvents||[]).find(e=>e.id===funFilterEventId) : null;
-  const date = filterEvent ? filterEvent.date : new Date().toISOString().split('T')[0];
+
+  const date = new Date().toISOString().split("T")[0];
   state.ttGames[player].unshift({id:Date.now()+'', date, begRating:'', win:'', loss:'', endRating:'', comment:''});
   renderFunTracker(); saveState();
 };
