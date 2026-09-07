@@ -2117,6 +2117,33 @@ height:28px;border-radius:50%;cursor:pointer;transition:transform 0.15s;flex-shr
           <p style="margin-bottom:8px;">• It's always okay to ask for help — that's what this button is for</p>
         </div>
       </div>
+
+      <!-- BACKUP SECTION — Dad/Pam only -->
+      <div class="card" style="margin-top:1rem;border:1px solid #D4A867;background:#FAEEDA;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+          <span style="font-size:24px;">💾</span>
+          <div>
+            <div style="font-size:15px;font-weight:700;color:#854F0B;">Data Backup &amp; Restore</div>
+            <div style="font-size:12px;color:#9A7020;">For Dad &amp; Mom — export weekly to protect your data</div>
+          </div>
+        </div>
+        <div style="font-size:13px;color:#633806;margin-bottom:14px;line-height:1.6;">
+          Export saves <strong>everything</strong> — tasks, notes, assignments, scores, agreements, schedule, and more — as a file on your device. Import restores from a previously saved file.
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+          <button onclick="exportBackup()" class="btn-sm primary" style="padding:10px;font-size:13px;background:#854F0B;border-color:#854F0B;">
+            ⬇️ Export Backup
+          </button>
+          <button onclick="document.getElementById('import-file-input').click()" class="btn-sm" style="padding:10px;font-size:13px;border-color:#854F0B;color:#854F0B;">
+            ⬆️ Import Backup
+          </button>
+        </div>
+        <input type="file" id="import-file-input" accept=".json" style="display:none;" onchange="importBackup(this)">
+        <div id="backup-status" style="font-size:12px;color:#854F0B;min-height:18px;text-align:center;"></div>
+        <div style="font-size:11px;color:#9A7020;margin-top:10px;padding-top:10px;border-top:1px solid #D4A867;">
+          💡 Recommended: export every Sunday evening and save to iCloud or Google Drive with today's date in the filename.
+        </div>
+      </div>
     </div>
 
   </main>
@@ -4657,6 +4684,65 @@ window.clearHelp = function(){
   state.helpFlag={active:false};
   renderHelpState();saveState();
 };
+
+// =================== BACKUP & RESTORE ===================
+window.exportBackup = function() {
+  try {
+    const backup = {
+      exportedAt: new Date().toISOString(),
+      exportedBy: 'Caden Homeschool Dashboard',
+      version: 1,
+      data: state
+    };
+    const json = JSON.stringify(backup, null, 2);
+    const blob = new Blob([json], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const dateStr = new Date().toISOString().split('T')[0];
+    a.href = url;
+    a.download = `caden-dashboard-backup-${dateStr}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    const status = document.getElementById('backup-status');
+    status.textContent = `✓ Backup saved: caden-dashboard-backup-${dateStr}.json`;
+    status.style.color = '#27500A';
+  } catch(e) {
+    const status = document.getElementById('backup-status');
+    status.textContent = '✗ Export failed: ' + e.message;
+    status.style.color = '#A32D2D';
+  }
+};
+
+window.importBackup = function(input) {
+  const file = input.files[0];
+  if(!file) return;
+  const status = document.getElementById('backup-status');
+  const reader = new FileReader();
+  reader.onload = async function(e) {
+    try {
+      const backup = JSON.parse(e.target.result);
+      if(!backup.data) throw new Error('Invalid backup file — missing data field.');
+      const confirm1 = confirm(
+        `Restore backup from ${new Date(backup.exportedAt).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}?\n\nThis will REPLACE all current data with the backup. This cannot be undone.`
+      );
+      if(!confirm1) { input.value=''; return; }
+      // Restore to Firebase
+      await setDoc(STATE_DOC, backup.data);
+      state = backup.data;
+      renderAll();
+      status.textContent = `✓ Restored from backup (${new Date(backup.exportedAt).toLocaleDateString()})`;
+      status.style.color = '#27500A';
+    } catch(err) {
+      status.textContent = '✗ Import failed: ' + err.message;
+      status.style.color = '#A32D2D';
+    }
+    input.value = '';
+  };
+  reader.readAsText(file);
+};
+// =================== END BACKUP & RESTORE ===================
 
 renderPomDots();
 renderTimerLog();
