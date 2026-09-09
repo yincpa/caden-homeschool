@@ -417,7 +417,12 @@ height:28px;border-radius:50%;cursor:pointer;transition:transform 0.15s;flex-shr
 
         <div class="section-label" style="font-size:10px;margin-bottom:6px;">Open</div>
         <div class="card" id="todo-open"></div>
-        <div class="section-label" style="font-size:10px;margin-top:1rem;margin-bottom:6px;">Completed</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:1rem;margin-bottom:6px;">
+          <div class="section-label" style="font-size:10px;margin-bottom:0;">Completed</div>
+          <select id="todo-done-filter" onchange="renderTodos()" style="font-size:12px;padding:3px 8px;height:28px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);font-family:inherit;">
+            <option value="">All subjects</option>
+          </select>
+        </div>
         <div class="card" id="todo-done"></div>
       </div>
     </div>
@@ -877,7 +882,10 @@ height:28px;border-radius:50%;cursor:pointer;transition:transform 0.15s;flex-shr
             <button onclick="addPERow()" class="btn-sm primary" style="font-size:12px;padding:5px 12px;">+ Add Row</button>
           </div>
 
-          <div class="pe-table-wrap">
+          <div style="display:flex;gap:6px;margin-bottom:14px;border-bottom:1px solid var(--border);padding-bottom:12px;flex-wrap:wrap;">
+            <button class="btn-sm" onclick="printPESummary()" title="Opens a print-friendly view — use Print to save as PDF">🖨 Print / Save PDF</button>
+            <button class="btn-sm" onclick="copyPESummary()" id="pe-copy-btn">📋 Copy as Text</button>
+          </div>
             <table class="pe-table">
               <thead>
                 <tr>
@@ -2799,8 +2807,9 @@ function renderTodos() {
       </div>`;
     }).join('');
   }
+  const filterSubject = document.getElementById('todo-done-filter')?.value || '';
   mkList(todos.filter(t=>!t.done),'todo-open');
-  mkList(todos.filter(t=>t.done),'todo-done');
+  mkList(todos.filter(t=>t.done && (!filterSubject || t.subject===filterSubject)),'todo-done');
 }
 
 window.toggleTodoForm = function() {
@@ -2857,9 +2866,11 @@ function buildTimeOptions() {
 }
 
 function populateDropdowns() {
-  ['sched-subj','todo-subject'].forEach(id => {
+  ['sched-subj','todo-subject','todo-done-filter'].forEach(id => {
     const el=document.getElementById(id); if(!el) return;
-    const ph=id==='sched-subj'?'<option value="">— clear —</option>':'<option value="">General</option>';
+    const ph = id==='sched-subj' ? '<option value="">— clear —</option>'
+             : id==='todo-done-filter' ? '<option value="">All subjects</option>'
+             : '<option value="">General</option>';
     const customOpt = id==='sched-subj' ? '<option value="__custom__">✏️ Custom / Write-in…</option>' : '';
     el.innerHTML=ph+SUBJECTS.filter(s=>s.id!=='').map(s=>`<option value="${s.id}">${s.name}</option>`).join('')+customOpt;
   });
@@ -3982,6 +3993,89 @@ function renderPEStatsAndWeekly() {
     </div>`;
   }).join('');
 }
+function buildPESummaryText() {
+  const log = (state.peLog||[]).slice().sort((a,b)=>a.date.localeCompare(b.date));
+  const totalHours = log.reduce((sum,r)=>sum+(parseFloat(r.hours)||0),0);
+  let txt = `CADEN — PE ACTIVITY LOG\n`;
+  txt += `Generated: ${new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}\n`;
+  txt += `Total Hours: ${totalHours}  |  Activities: ${log.length}\n`;
+  txt += `${'='.repeat(50)}\n\n`;
+  log.forEach(r => {
+    const d = new Date(r.date+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    txt += `${d}  |  ${r.activity||'—'}  |  ${r.hours||0} hrs\n`;
+  });
+  return txt;
+}
+
+window.copyPESummary = function() {
+  const txt = buildPESummaryText();
+  navigator.clipboard.writeText(txt).then(() => {
+    const btn = document.getElementById('pe-copy-btn');
+    const orig = btn.textContent;
+    btn.textContent = '✓ Copied!';
+    setTimeout(()=>{btn.textContent=orig;},2000);
+  }).catch(()=>alert(buildPESummaryText()));
+};
+
+window.printPESummary = function() {
+  const log = (state.peLog||[]).slice().sort((a,b)=>a.date.localeCompare(b.date));
+  const totalHours = log.reduce((sum,r)=>sum+(parseFloat(r.hours)||0),0);
+
+  // Weekly breakdown
+  const weekMap = {};
+  log.forEach(r => {
+    if(!r.date) return;
+    const wk = getWeekStart(r.date);
+    if(!weekMap[wk]) weekMap[wk] = 0;
+    weekMap[wk] += (parseFloat(r.hours)||0);
+  });
+
+  const rows = log.map(r => {
+    const d = new Date(r.date+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    return `<tr>
+      <td style="padding:8px;border-bottom:1px solid #ddd;">${d}</td>
+      <td style="padding:8px;border-bottom:1px solid #ddd;">${r.activity||'—'}</td>
+      <td style="padding:8px;border-bottom:1px solid #ddd;text-align:center;font-weight:600;">${r.hours||0}</td>
+    </tr>`;
+  }).join('');
+
+  const weekRows = Object.keys(weekMap).sort().map(wk => {
+    const start = new Date(wk+'T12:00:00');
+    const end = new Date(start); end.setDate(end.getDate()+6);
+    return `<tr>
+      <td style="padding:6px 8px;border-bottom:1px solid #eee;">${fmtShortDate(wk)} – ${fmtShortDate(end.toISOString().split('T')[0])}</td>
+      <td style="padding:6px 8px;border-bottom:1px solid #eee;text-align:center;font-weight:600;color:#993C1D;">${weekMap[wk]} hrs</td>
+    </tr>`;
+  }).join('');
+
+  const win = window.open('','_blank');
+  win.document.write(`<html><head><title>Caden — PE Activity Log</title>
+  <style>body{font-family:-apple-system,sans-serif;padding:30px;color:#1A1917;max-width:700px;margin:0 auto;}
+  h1{font-size:20px;margin-bottom:4px;}.meta{font-size:13px;color:#666;margin-bottom:6px;}
+  .stats{display:flex;gap:16px;margin-bottom:24px;}
+  .stat{padding:8px 16px;background:#FAECE7;border-radius:8px;}
+  .stat b{font-size:18px;display:block;}
+  table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:24px;}
+  th{text-align:left;padding:8px;background:#FAECE7;border-bottom:2px solid #E0A890;}
+  h2{font-size:15px;margin-bottom:8px;color:#993C1D;}
+  @media print{body{padding:10px;}}</style></head><body>
+  <h1>Caden — PE Activity Log</h1>
+  <div class="meta">Generated ${new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}</div>
+  <div class="stats">
+    <div class="stat"><b>${totalHours}</b>Total Hours</div>
+    <div class="stat"><b>${log.length}</b>Activities</div>
+    <div class="stat"><b>${log.length?(totalHours/log.length).toFixed(1):0}</b>Avg hrs/activity</div>
+  </div>
+  <h2>Activity Log</h2>
+  <table><thead><tr><th>Date</th><th>Activity</th><th style="text-align:center;">Hours</th></tr></thead>
+  <tbody>${rows}</tbody></table>
+  <h2>Weekly Breakdown</h2>
+  <table><thead><tr><th>Week</th><th style="text-align:center;">Hours</th></tr></thead>
+  <tbody>${weekRows}</tbody></table>
+  </body></html>`);
+  win.document.close();
+  setTimeout(()=>win.print(),300);
+};
 // =================== END PE TRACKER ===================
 
 // =================== READING LOG TRACKER ===================
