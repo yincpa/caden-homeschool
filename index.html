@@ -2807,9 +2807,14 @@ function renderTodos() {
       </div>`;
     }).join('');
   }
-  const filterSubject = document.getElementById('todo-done-filter')?.value || '';
+  const filterEl = document.getElementById('todo-done-filter');
+  const filterSubject = filterEl ? filterEl.options[filterEl.selectedIndex]?.value || '' : '';
   mkList(todos.filter(t=>!t.done),'todo-open');
-  mkList(todos.filter(t=>t.done && (!filterSubject || t.subject===filterSubject)),'todo-done');
+  mkList(todos.filter(t => {
+    if(!t.done) return false;
+    if(!filterSubject) return true;
+    return (t.subject||'') === filterSubject;
+  }),'todo-done');
 }
 
 window.toggleTodoForm = function() {
@@ -2895,6 +2900,7 @@ window.switchTab = function(name) {
   document.querySelectorAll('.nav-btn')[tabs.indexOf(name)].classList.add('active');
   if(name==='timer') startClock();
   if(name==='notes') initNotesTab();
+  if(name==='courses') populateDropdowns();
   if(name==='funstuffs') { renderFunEvents(); renderFunTracker(); }
 };
 
