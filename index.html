@@ -2771,7 +2771,7 @@ function renderCredits() {
   document.getElementById('credits-list').innerHTML = html;
 }
 
-function renderTodos() {
+window.renderTodos = function renderTodos() {
   const todos = state.todos||[];
   const priC = {high:'#A32D2D',normal:'#0C447C',low:'#5F5E5A'};
   const priB = {high:'#FCEBEB',normal:'#E6F1FB',low:'#F1EFE8'};
@@ -2809,9 +2809,9 @@ function renderTodos() {
   }
   const filterEl = document.getElementById('todo-done-filter');
   const filterSubject = filterEl ? filterEl.options[filterEl.selectedIndex]?.value || '' : '';
+  const doneTodos = todos.filter(t=>t.done);
   mkList(todos.filter(t=>!t.done),'todo-open');
-  mkList(todos.filter(t => {
-    if(!t.done) return false;
+  mkList(doneTodos.filter(t => {
     if(!filterSubject) return true;
     return (t.subject||'') === filterSubject;
   }),'todo-done');
