@@ -510,8 +510,8 @@ height:28px;border-radius:50%;cursor:pointer;transition:transform 0.15s;flex-shr
           </div>
           <div id="note-editor" contenteditable="true" class="note-editor" data-placeholder="Start typing your class notes here…"></div>
           <div style="display:flex;gap:8px;margin-top:10px;">
-            <button class="btn-sm primary" onclick="saveClassNote()" style="flex:1;">Save Note</button>
-            <button class="btn-sm" onclick="toggleNoteForm()">Cancel</button>
+            <button class="btn-sm primary" id="note-save-btn" onclick="saveClassNote()" style="flex:1;">Save Note</button>
+            <button class="btn-sm" onclick="cancelNoteEdit()">Cancel</button>
           </div>
         </div>
       </div>
@@ -2945,18 +2945,47 @@ window.selectNoteSubject = function(id, btn) {
   renderNotesList();
 };
 
+let noteEditingId = null;
+
 window.toggleNoteForm = function() {
   const wrap = document.getElementById('note-form-wrap');
   const btn = document.getElementById('note-form-toggle-btn');
   const isOpen = wrap.style.display !== 'none';
-  wrap.style.display = isOpen ? 'none' : 'block';
-  btn.textContent = isOpen ? '+ Add Note' : '✕ Close';
-  if(!isOpen) {
-    document.getElementById('note-editor').innerHTML = '';
-    const di = document.getElementById('note-date');
-    di.value = new Date().toISOString().split('T')[0];
-    document.getElementById('note-editor').focus();
-  }
+  if(isOpen) { cancelNoteEdit(); return; }
+  noteEditingId = null;
+  document.getElementById('note-save-btn').textContent = 'Save Note';
+  document.getElementById('note-editor').innerHTML = '';
+  document.getElementById('note-date').value = new Date().toISOString().split('T')[0];
+  // Reset author to Caden
+  document.querySelectorAll('.note-author-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelector('.note-author-btn[data-author="Caden"]').classList.add('active');
+  wrap.style.display = 'block';
+  btn.textContent = '✕ Close';
+  document.getElementById('note-editor').focus();
+};
+
+window.cancelNoteEdit = function() {
+  noteEditingId = null;
+  document.getElementById('note-form-wrap').style.display = 'none';
+  document.getElementById('note-form-toggle-btn').textContent = '+ Add Note';
+  document.getElementById('note-save-btn').textContent = 'Save Note';
+  document.getElementById('note-editor').innerHTML = '';
+};
+
+window.editClassNote = function(id) {
+  const n = (state.classNotes||[]).find(n=>n.id===id);
+  if(!n) return;
+  noteEditingId = id;
+  document.getElementById('note-date').value = n.date||'';
+  document.getElementById('note-editor').innerHTML = n.content||'';
+  // Set author
+  document.querySelectorAll('.note-author-btn').forEach(b=>b.classList.remove('active'));
+  const ab = document.querySelector(`.note-author-btn[data-author="${n.author}"]`);
+  if(ab) ab.classList.add('active');
+  document.getElementById('note-save-btn').textContent = 'Update Note';
+  document.getElementById('note-form-wrap').style.display = 'block';
+  document.getElementById('note-form-toggle-btn').textContent = '✕ Close';
+  document.getElementById('note-form-wrap').scrollIntoView({behavior:'smooth', block:'center'});
 };
 
 window.selectAuthor = function(btn) {
@@ -2990,15 +3019,22 @@ window.saveClassNote = function() {
   if(!content || content === '<br>') { alert('Please write something before saving.'); return; }
   if(!date) { alert('Please select a date.'); return; }
   if(!state.classNotes) state.classNotes = [];
-  state.classNotes.unshift({
-    id: Date.now()+'',
-    subject: currentNoteSubject,
-    date, author, content,
-    created: new Date().toISOString()
-  });
+  if(noteEditingId) {
+    const n = state.classNotes.find(n=>n.id===noteEditingId);
+    if(n) { n.date=date; n.author=author; n.content=content; }
+    noteEditingId = null;
+  } else {
+    state.classNotes.unshift({
+      id: Date.now()+'',
+      subject: currentNoteSubject,
+      date, author, content,
+      created: new Date().toISOString()
+    });
+  }
   document.getElementById('note-editor').innerHTML = '';
   document.getElementById('note-form-wrap').style.display = 'none';
   document.getElementById('note-form-toggle-btn').textContent = '+ Add Note';
+  document.getElementById('note-save-btn').textContent = 'Save Note';
   renderNotesList();
   saveState();
 };
@@ -3067,7 +3103,10 @@ function renderNotesList() {
           <span class="note-author-tag" style="background:${ac.bg};color:${ac.color};">${n.author}</span>
           ${isSearchMode?`<span style="font-size:11px;padding:2px 8px;border-radius:99px;background:var(--bg);color:var(--text-2);border:1px solid var(--border);">${subName}</span>`:''}
         </div>
-        <button class="del-btn" onclick="deleteClassNote('${n.id}')" title="Delete note">×</button>
+        <div style="display:flex;align-items:center;gap:4px;">
+          <button class="agr-edit-btn" onclick="editClassNote('${n.id}')" title="Edit note">✏️</button>
+          <button class="del-btn" onclick="deleteClassNote('${n.id}')" title="Delete note">×</button>
+        </div>
       </div>
       <div class="note-card-body">${bodyHtml}</div>
     </div>`;
