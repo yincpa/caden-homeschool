@@ -3300,6 +3300,13 @@ window.saveWHAnswer = function(assignId, qIdx, value) {
   saveState();
 };
 
+window.saveWHScore = function(assignId, qIdx, value) {
+  const a = (state.whAssignments||[]).find(a=>a.id===assignId);
+  if(!a || !a.questions[qIdx]) return;
+  a.questions[qIdx].score = value;
+  saveState();
+};
+
 window.deleteWHAssignment = function(id) {
   if(!confirm('Delete this assignment?')) return;
   state.whAssignments = (state.whAssignments||[]).filter(a=>a.id!==id);
@@ -3388,6 +3395,14 @@ function renderWHTracker() {
               onchange="saveWHAnswer('${a.id}',${i},this.value)"
               oninput="this.className='wh-answer-input'+(this.value.trim()?' wh-answered':'')"
             >${qa.answer||''}</textarea>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:8px;">
+            <div class="wh-answer-label" style="margin-bottom:0;white-space:nowrap;">Teacher Score</div>
+            <input type="text" value="${qa.score||''}" placeholder="e.g. 8/10"
+              style="width:90px;font-size:13px;padding:5px 8px;border:1px solid var(--border);border-radius:var(--radius-sm);background:${qa.score?'#EAF3DE':'var(--bg)'};color:${qa.score?'#27500A':'var(--text)'};font-family:inherit;text-align:center;"
+              onchange="saveWHScore('${a.id}',${i},this.value)"
+              oninput="this.style.background=this.value?'#EAF3DE':'var(--bg)';this.style.color=this.value?'#27500A':'var(--text)';"
+              placeholder="Score…">
           </div>
         </div>`).join('')}
     </div>`;
@@ -3694,6 +3709,7 @@ window.printWHSummary = function() {
         <div style="font-size:13px;color:#1A1917;padding:8px 12px;background:#F7F6F3;border-radius:6px;min-height:36px;line-height:1.6;">
           ${qa.answer&&qa.answer.trim() ? qa.answer.trim().replace(/\n/g,'<br>') : '<span style="color:#9B9891;font-style:italic;">Not answered</span>'}
         </div>
+        ${qa.score?`<div style="margin-top:4px;font-size:12px;font-weight:600;color:#27500A;">Score: ${qa.score}</div>`:''}
       </div>`).join('');
     const status = isAssignmentComplete(a);
     return `<div style="margin-bottom:24px;page-break-inside:avoid;">
