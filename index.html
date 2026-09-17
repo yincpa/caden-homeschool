@@ -3100,10 +3100,11 @@ window.noteColor = function(color) {
   editor.focus();
   const sel = window.getSelection();
   if(!sel || sel.rangeCount === 0 || sel.toString().length === 0) return;
-  // Use execCommand foreColor for broad browser support
   document.execCommand('styleWithCSS', false, true);
   document.execCommand('foreColor', false, color === 'var(--text)' ? 'inherit' : color);
 };
+
+window.noteHighlight = function() {
   const editor = document.getElementById('note-editor');
   editor.focus();
   const sel = window.getSelection();
@@ -3113,18 +3114,16 @@ window.noteColor = function(color) {
 
   // Check if selection is inside a <mark> — if so, unwrap it
   let node = range.commonAncestorContainer;
-  if(node.nodeType === 3) node = node.parentNode; // text node → parent
+  if(node.nodeType === 3) node = node.parentNode;
   const mark = node.closest ? node.closest('mark') : null;
 
   if(mark) {
-    // Unwrap: replace <mark> with its text content
     const parent = mark.parentNode;
     while(mark.firstChild) parent.insertBefore(mark.firstChild, mark);
     parent.removeChild(mark);
   } else {
-    // Wrap selection in <mark>
-    const mark = document.createElement('mark');
-    range.surroundContents(mark);
+    const newMark = document.createElement('mark');
+    range.surroundContents(newMark);
   }
 };
 
