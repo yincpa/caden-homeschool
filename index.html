@@ -3104,38 +3104,57 @@ window.noteColor = function(color) {
   document.execCommand('foreColor', false, color === 'var(--text)' ? 'inherit' : color);
 };
 
+window.noteClearHighlights = function() {
+  const editor = document.getElementById('note-editor');
+  if(!editor) return;
+  // Browser converts <mark> to <span style="background-color: rgb(255, 245, 157);">
+  // So we need to unwrap those spans
+  editor.querySelectorAll('span[style*="background-color"]').forEach(function(span) {
+    const bg = span.style.backgroundColor;
+    // Match yellow highlight colors
+    if(bg === 'rgb(255, 245, 157)' || bg === 'rgb(255, 249, 196)' || bg === 'rgb(255, 249, 157)' || bg.includes('255, 24')) {
+      const parent = span.parentNode;
+      while(span.firstChild) parent.insertBefore(span.firstChild, span);
+      parent.removeChild(span);
+    }
+  });
+  // Also strip any remaining mark tags and inline background styles as fallback
+  editor.innerHTML = editor.innerHTML
+    .replace(/<mark[^>]*>/gi, '')
+    .replace(/<\/mark>/gi, '')
+    .replace(/style="([^"]*background-color:\s*rgb\(255,\s*24[^"]*)"([^>]*)>/gi, function(match, style, rest) {
+      const cleaned = style.replace(/background-color:\s*rgb\(255,\s*24[^;]*;?\s*/gi, '').trim();
+      return cleaned ? `style="${cleaned}"${rest}>` : `${rest}>`;
+    });
+};
+
 window.noteHighlight = function() {
   const editor = document.getElementById('note-editor');
   if(!editor) return;
+  const sel = window.getSelection();
+  if(!sel || sel.rangeCount === 0) return;
 
-  function findMark(node) {
+  // Check if cursor is inside a highlighted span
+  function findHighlight(node) {
     while(node) {
-      if(node.nodeName === 'MARK') return node;
       if(node === editor) return null;
+      if(node.nodeType === 1 && node.style && node.style.backgroundColor &&
+         node.style.backgroundColor.includes('255, 24')) return node;
       node = node.parentNode;
     }
     return null;
   }
 
-  const sel = window.getSelection();
-  if(!sel || sel.rangeCount === 0) return;
-
-  const existingMark = findMark(sel.anchorNode);
-
-  if(existingMark) {
-    const parent = existingMark.parentNode;
-    while(existingMark.firstChild) parent.insertBefore(existingMark.firstChild, existingMark);
-    parent.removeChild(existingMark);
+  const existing = findHighlight(sel.anchorNode);
+  if(existing) {
+    const parent = existing.parentNode;
+    while(existing.firstChild) parent.insertBefore(existing.firstChild, existing);
+    parent.removeChild(existing);
   } else {
     const selectedText = sel.toString();
     if(!selectedText) return;
-    const range = sel.getRangeAt(0);
-    const mark = document.createElement('mark');
-    try {
-      range.surroundContents(mark);
-    } catch(e) {
-      document.execCommand('insertHTML', false, '<mark>' + selectedText + '</mark>');
-    }
+    document.execCommand('styleWithCSS', false, true);
+    document.execCommand('hiliteColor', false, 'rgb(255, 245, 157)');
   }
 };
 
