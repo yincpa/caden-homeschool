@@ -3106,24 +3106,36 @@ window.noteColor = function(color) {
 
 window.noteHighlight = function() {
   const editor = document.getElementById('note-editor');
-  editor.focus();
+  if(!editor) return;
+
+  function findMark(node) {
+    while(node) {
+      if(node.nodeName === 'MARK') return node;
+      if(node === editor) return null;
+      node = node.parentNode;
+    }
+    return null;
+  }
+
   const sel = window.getSelection();
-  if(!sel || sel.rangeCount === 0 || sel.toString().length === 0) return;
+  if(!sel || sel.rangeCount === 0) return;
 
-  const range = sel.getRangeAt(0);
+  const existingMark = findMark(sel.anchorNode);
 
-  // Check if selection is inside a <mark> — if so, unwrap it
-  let node = range.commonAncestorContainer;
-  if(node.nodeType === 3) node = node.parentNode;
-  const mark = node.closest ? node.closest('mark') : null;
-
-  if(mark) {
-    const parent = mark.parentNode;
-    while(mark.firstChild) parent.insertBefore(mark.firstChild, mark);
-    parent.removeChild(mark);
+  if(existingMark) {
+    const parent = existingMark.parentNode;
+    while(existingMark.firstChild) parent.insertBefore(existingMark.firstChild, existingMark);
+    parent.removeChild(existingMark);
   } else {
-    const newMark = document.createElement('mark');
-    range.surroundContents(newMark);
+    const selectedText = sel.toString();
+    if(!selectedText) return;
+    const range = sel.getRangeAt(0);
+    const mark = document.createElement('mark');
+    try {
+      range.surroundContents(mark);
+    } catch(e) {
+      document.execCommand('insertHTML', false, '<mark>' + selectedText + '</mark>');
+    }
   }
 };
 
