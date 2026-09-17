@@ -172,7 +172,8 @@ select { font-size: 13px; padding: 7px 8px; border: 1px solid var(--border); bor
 .toolbar-btn { font-size:12px; padding:4px 8px; border:1px solid var(--border); border-radius:4px; background:var(--surface); cursor:pointer; color:var(--text); font-family:inherit; line-height:1.4; }
 .toolbar-btn:hover { background:var(--blue-light); border-color:var(--blue); color:var(--blue); }
 .toolbar-sep { width:1px; height:18px; background:var(--border); margin:0 2px; }
-.highlight-btn { background:#FFF9C4; border-color:#D4B800; color:#7A6500; }
+.toolbar-color-btn { width:18px;height:18px;border-radius:50%;border:2px solid transparent;cursor:pointer;padding:0;flex-shrink:0;transition:transform 0.1s; }
+.toolbar-color-btn:hover { transform:scale(1.2);border-color:var(--border); }
 .note-editor { min-height:160px; padding:12px; border:1px solid var(--border); border-top:none; border-radius:0 0 var(--radius-sm) var(--radius-sm); background:var(--surface); color:var(--text); font-size:14px; line-height:1.7; outline:none; font-family:inherit; }
 .note-editor:empty::before { content:attr(data-placeholder); color:var(--text-3); pointer-events:none; }
 .note-editor h3 { font-size:15px; font-weight:700; margin:8px 0 4px; color:var(--text); }
@@ -507,7 +508,15 @@ height:28px;border-radius:50%;cursor:pointer;transition:transform 0.15s;flex-shr
             <button class="toolbar-btn" onmousedown="event.preventDefault();noteFormatBlock('H3')" title="Heading"><b>H</b></button>
             <button class="toolbar-btn" onmousedown="event.preventDefault();noteFormatBlock('P')" title="Normal">¶</button>
             <div class="toolbar-sep"></div>
-            <button class="toolbar-btn highlight-btn" onmousedown="event.preventDefault();noteHighlight()" title="Highlight key term">🖊 Key</button>
+            <button class="toolbar-btn highlight-btn" onmousedown="event.preventDefault();noteHighlight()" title="Highlight / un-highlight selected text">🖊 Highlight</button>
+            <div class="toolbar-sep"></div>
+            <span style="font-size:11px;color:var(--text-3);padding:0 2px;">A</span>
+            <button class="toolbar-color-btn" onmousedown="event.preventDefault();noteColor('#A32D2D')" title="Red" style="background:#A32D2D;"></button>
+            <button class="toolbar-color-btn" onmousedown="event.preventDefault();noteColor('#854F0B')" title="Orange" style="background:#854F0B;"></button>
+            <button class="toolbar-color-btn" onmousedown="event.preventDefault();noteColor('#1E40AF')" title="Blue" style="background:#1E40AF;"></button>
+            <button class="toolbar-color-btn" onmousedown="event.preventDefault();noteColor('#27500A')" title="Green" style="background:#27500A;"></button>
+            <button class="toolbar-color-btn" onmousedown="event.preventDefault();noteColor('#6B2D8B')" title="Purple" style="background:#6B2D8B;"></button>
+            <button class="toolbar-color-btn" onmousedown="event.preventDefault();noteColor('var(--text)')" title="Default (remove color)" style="background:var(--border);font-size:9px;color:var(--text-2);">✕</button>
           </div>
           <div id="note-editor" contenteditable="true" class="note-editor" data-placeholder="Start typing your class notes here…"></div>
           <div style="display:flex;gap:8px;margin-top:10px;">
@@ -3086,11 +3095,36 @@ window.noteFormatBlock = function(tag) {
   document.execCommand('formatBlock', false, tag);
 };
 
-window.noteHighlight = function() {
-  document.getElementById('note-editor').focus();
+window.noteColor = function(color) {
+  const editor = document.getElementById('note-editor');
+  editor.focus();
   const sel = window.getSelection();
-  if(sel && sel.toString().length > 0) {
-    document.execCommand('insertHTML', false, `<mark>${sel.toString()}</mark>`);
+  if(!sel || sel.rangeCount === 0 || sel.toString().length === 0) return;
+  // Use execCommand foreColor for broad browser support
+  document.execCommand('styleWithCSS', false, true);
+  document.execCommand('foreColor', false, color === 'var(--text)' ? 'inherit' : color);
+};
+  const editor = document.getElementById('note-editor');
+  editor.focus();
+  const sel = window.getSelection();
+  if(!sel || sel.rangeCount === 0 || sel.toString().length === 0) return;
+
+  const range = sel.getRangeAt(0);
+
+  // Check if selection is inside a <mark> — if so, unwrap it
+  let node = range.commonAncestorContainer;
+  if(node.nodeType === 3) node = node.parentNode; // text node → parent
+  const mark = node.closest ? node.closest('mark') : null;
+
+  if(mark) {
+    // Unwrap: replace <mark> with its text content
+    const parent = mark.parentNode;
+    while(mark.firstChild) parent.insertBefore(mark.firstChild, mark);
+    parent.removeChild(mark);
+  } else {
+    // Wrap selection in <mark>
+    const mark = document.createElement('mark');
+    range.surroundContents(mark);
   }
 };
 
