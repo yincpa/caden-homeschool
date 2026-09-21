@@ -2348,20 +2348,42 @@ function setSyncStatus(status) {
   label.textContent = status === 'synced' ? 'Synced ✓' : status === 'saving' ? 'Saving…' : status === 'error' ? 'Offline' : 'Connecting…';
 }
 
+// Firestore doesn't allow '|' in field names — encode/decode schedule keys
+function encodeSchedule(sched) {
+  if(!sched) return {};
+  const encoded = {};
+  Object.keys(sched).forEach(k => {
+    encoded[k.replace(/\|/g, '__')] = sched[k];
+  });
+  return encoded;
+}
+function decodeSchedule(sched) {
+  if(!sched) return {};
+  const decoded = {};
+  Object.keys(sched).forEach(k => {
+    decoded[k.replace(/__/g, '|')] = sched[k];
+  });
+  return decoded;
+}
+
 async function saveState() {
   setSyncStatus('saving');
-  lastSaveTime = Date.now(); // block onSnapshot immediately
+  lastSaveTime = Date.now();
   clearTimeout(saveTimer);
   saveTimer = setTimeout(async () => {
     try {
-      await setDoc(STATE_DOC, state);
-      lastSaveTime = Date.now(); // refresh after write so 10s window starts from completion
+      // Encode schedule keys before saving to Firestore
+      const toSave = Object.assign({}, state, {
+        schedule: encodeSchedule(state.schedule)
+      });
+      await setDoc(STATE_DOC, toSave);
+      lastSaveTime = Date.now();
       setSyncStatus('synced');
     } catch(e) { setSyncStatus('error'); }
   }, 800);
 }
 
-const SCHEDULE_VERSION = 12; // increment this to force-reset the schedule
+const SCHEDULE_VERSION = 13; // increment this to force-reset the schedule
 
 // Real-time listener
 let lastSaveTime = 0;
@@ -2372,6 +2394,8 @@ onSnapshot(STATE_DOC, (snap) => {
 
   if (snap.exists()) {
     const remote = snap.data();
+    // Decode schedule keys (| was encoded as __ for Firestore)
+    if (remote.schedule) remote.schedule = decodeSchedule(remote.schedule);
     if (!remote.schedule) remote.schedule = buildDefaultSchedule();
     if (!remote.customEvents) remote.customEvents = [];
     if (!remote.todos) remote.todos = [];
