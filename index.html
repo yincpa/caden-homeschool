@@ -2350,11 +2350,12 @@ function setSyncStatus(status) {
 
 async function saveState() {
   setSyncStatus('saving');
-  lastSaveTime = Date.now();
+  lastSaveTime = Date.now(); // block onSnapshot immediately
   clearTimeout(saveTimer);
   saveTimer = setTimeout(async () => {
     try {
       await setDoc(STATE_DOC, state);
+      lastSaveTime = Date.now(); // refresh after write so 10s window starts from completion
       setSyncStatus('synced');
     } catch(e) { setSyncStatus('error'); }
   }, 800);
@@ -2366,8 +2367,8 @@ const SCHEDULE_VERSION = 12; // increment this to force-reset the schedule
 let lastSaveTime = 0;
 
 onSnapshot(STATE_DOC, (snap) => {
-  // Skip remote update if we just saved locally (within 5 seconds)
-  if(Date.now() - lastSaveTime < 5000) return;
+  // Skip remote update if we just saved locally (within 10 seconds)
+  if(Date.now() - lastSaveTime < 10000) return;
 
   if (snap.exists()) {
     const remote = snap.data();
