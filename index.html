@@ -2372,14 +2372,16 @@ async function saveState() {
   clearTimeout(saveTimer);
   saveTimer = setTimeout(async () => {
     try {
-      // Encode schedule keys before saving to Firestore
       const toSave = Object.assign({}, state, {
         schedule: encodeSchedule(state.schedule)
       });
       await setDoc(STATE_DOC, toSave);
       lastSaveTime = Date.now();
       setSyncStatus('synced');
-    } catch(e) { setSyncStatus('error'); }
+    } catch(e) {
+      console.error('Save error:', e);
+      setSyncStatus('error'); 
+    }
   }, 800);
 }
 
@@ -2712,7 +2714,7 @@ function timeKeyToValue(t){
 }
 function getSchedBlockDisplay(val){
   if(!val) return null;
-  if(typeof val==='object'&&val.__custom__)
+  if(typeof val==='object'&&val.isCustom)
     return{name:val.label||'Custom',bg:val.bg||'#F1EFE8',color:val.color||'#444441'};
   const sub=SUBJECTS.find(s=>s.id===val);
   return sub?{name:sub.name,bg:sub.bg,color:sub.color}:null;
@@ -2785,7 +2787,7 @@ window.editSchedBlock=function(day,time){
   if(document.getElementById('sched-start'))document.getElementById('sched-start').value=startVal;
   const val=state.schedule[day+'|'+time];
   const subjEl=document.getElementById('sched-subj');
-  if(typeof val==='object'&&val&&val.__custom__){
+  if(typeof val==='object'&&val&&val.isCustom){
     subjEl.value='__custom__';
     document.getElementById('sched-custom-wrap').style.display='block';
     document.getElementById('sched-custom-label').value=val.label||'';
@@ -2832,7 +2834,7 @@ window.applyBlock=function(){
   } else {
     const colr=getSelectedColor();
     state.schedule[activeKey]=subj==='__custom__'
-      ?{__custom__:true,label:customLabel,end,bg:colr.bg,color:colr.color}
+      ?{isCustom:true,label:customLabel,end,bg:colr.bg,color:colr.color}
       :subj;
     state.schedule[activeKey+'|end']=end;
   }
