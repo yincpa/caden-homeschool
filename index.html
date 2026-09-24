@@ -510,6 +510,8 @@ height:28px;border-radius:50%;cursor:pointer;transition:transform 0.15s;flex-shr
             <div class="toolbar-sep"></div>
             <button class="toolbar-btn highlight-btn" onmousedown="event.preventDefault();noteHighlight()" title="Highlight / un-highlight selected text">🖊 Highlight</button>
             <div class="toolbar-sep"></div>
+            <button class="toolbar-btn" onmousedown="event.preventDefault();noteClearFormatting()" title="Select text with a stray background/color (e.g. from a paste) and click this to strip it back to plain text">🧹 Clear Formatting</button>
+            <div class="toolbar-sep"></div>
             <span style="font-size:11px;color:var(--text-3);padding:0 2px;">A</span>
             <button class="toolbar-color-btn" onmousedown="event.preventDefault();noteColor('#A32D2D')" title="Red" style="background:#A32D2D;"></button>
             <button class="toolbar-color-btn" onmousedown="event.preventDefault();noteColor('#854F0B')" title="Orange" style="background:#854F0B;"></button>
@@ -3115,6 +3117,63 @@ window.selectAuthor = function(btn) {
 window.noteFormat = function(cmd) {
   document.getElementById('note-editor').focus();
   document.execCommand(cmd, false, null);
+};
+
+// Pasted content from other apps/websites (Google Docs, dark-mode pages, PDFs, etc.)
+// often carries inline background-color/color/font styling in its clipboard HTML.
+// Chrome will happily paste that straight into the note, which is how a copied
+// passage can show up with a black (or any other) background that won't go away
+// no matter what the user selects afterward. Force paste to plain text so every
+// paste starts clean; the toolbar above (bold/italic/highlight/color) still works
+// normally on the plain text once it's in the note.
+(function(){
+  const editor = document.getElementById('note-editor');
+  if(!editor) return;
+  editor.addEventListener('paste', function(e){
+    e.preventDefault();
+    const clip = e.clipboardData || window.clipboardData;
+    const text = clip ? clip.getData('text/plain') : '';
+    const sel = window.getSelection();
+    if(!sel || sel.rangeCount === 0) return;
+    const range = sel.getRangeAt(0);
+    range.deleteContents();
+    const lines = text.split(/\r\n|\r|\n/);
+    const frag = document.createDocumentFragment();
+    lines.forEach(function(line, i){
+      frag.appendChild(document.createTextNode(line));
+      if(i < lines.length - 1) frag.appendChild(document.createElement('br'));
+    });
+    const lastNode = frag.lastChild;
+    range.insertNode(frag);
+    if(lastNode){
+      const newRange = document.createRange();
+      newRange.setStartAfter(lastNode);
+      newRange.collapse(true);
+      sel.removeAllRanges();
+      sel.addRange(newRange);
+    }
+  });
+})();
+
+// Manual "fix it" button for content that already has stray inline colors/backgrounds
+// baked in (e.g. a note saved before the paste fix above existed). Select the affected
+// text and click Clear Formatting to strip all inline styling back to plain text.
+window.noteClearFormatting = function() {
+  const editor = document.getElementById('note-editor');
+  editor.focus();
+  const sel = window.getSelection();
+  if(!sel || sel.rangeCount === 0 || sel.toString().length === 0) {
+    alert('Select the text you want to fix first (click and drag over it), then click Clear Formatting.');
+    return;
+  }
+  document.execCommand('styleWithCSS', false, true);
+  document.execCommand('removeFormat', false, null);
+  // removeFormat can still leave a background-color on some browsers; sweep it explicitly.
+  editor.querySelectorAll('span[style*="background"], font[style*="background"]').forEach(function(span){
+    const parent = span.parentNode;
+    while(span.firstChild) parent.insertBefore(span.firstChild, span);
+    parent.removeChild(span);
+  });
 };
 
 window.noteFormatBlock = function(tag) {
